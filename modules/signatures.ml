@@ -63,3 +63,6 @@ module ListStack: LIST_STACK = struct
     | _ :: s -> s
 end
 
+let s1 : int LIST_STACK.t = ListStack.(empty |> push 42)
+let s2 = ListStack.push "jj" s
+

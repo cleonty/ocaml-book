@@ -1,0 +1,46 @@
+module type Map = sig
+  (** [('k, 'v) t] is the type of maps that bind keys of type ['k] to
+      values of type ['v]. *)
+  type ('k, 'v) t
+
+  (** [empty] does not bind any keys. *)
+  val empty  : ('k, 'v) t
+
+  (** [insert k v m] is the map that binds [k] to [v], and also contains
+      all the bindings of [m].  If [k] was already bound in [m], that old
+      binding is superseded by the binding to [v] in the returned map. *)
+  val insert : 'k -> 'v -> ('k, 'v) t -> ('k, 'v) t
+
+  (** [lookup k m] is the value bound to [k] in [m]. Raises: [Not_found] if [k]
+      is not bound in [m]. *)
+  val lookup : 'k -> ('k, 'v) t -> 'v
+
+  (** [bindings m] is an association list containing the same bindings as [m].
+      The keys in the list are guaranteed to be unique. *)
+  val bindings : ('k, 'v) t -> ('k * 'v) list
+end
+
+module AssocListMap : Map = struct
+  type ('k, 'v) t = ('k * 'v) list
+  let empty = []
+  let insert k v m = (k, v) :: m
+  let lookup k m = List.assoc k m
+  let keys m = List.(m |> map fst |> sort_uniq Stdlib.compare)
+  let bindings m = m |> keys |> List.map (fun k -> (k, (lookup k m)))
+end
+
+open AssocListMap
+let m = empty |> insert "pi" 3.14 |> insert "e" 2.718
+let m' = m |> insert "phi" 1.618
+let b = bindings m
+let b' = bindings m'
+
+module UniqAssocListMap : Map = struct
+  (** The list [(k1, v1); ...; (kn, vn)] binds key [ki] to value [vi].
+      No duplicate keys may occur. *)
+  type ('k, 'v) t = ('k * 'v) list
+  let empty = []
+  let insert k v m = (k, v) :: List.remove_assoc k m
+  let lookup k m = List.assoc k m
+  let bindings m = m
+end
