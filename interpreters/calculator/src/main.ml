@@ -22,6 +22,7 @@ let rec step : expr -> expr = function
     [v1 bop v2]. Requires: [v1] and [v2] are both values. *)
 and step_binop bop v1 v2 = match bop, v1, v2 with
   | Add, Int a, Int b -> Int (a + b)
+  | Mult, Int a, Int b -> Int (a * b)
   | _ -> failwith "precondition violated"
 
 (** [string_of_val e] converts [e] to a string.
