@@ -7,6 +7,10 @@
 %token TIMES
 %token PLUS
 
+/* both are left assosiative, but TIMES has higher precedence */ 
+%left PLUS
+%left TIMES
+
 %start <Ast.expr> prog
 
 %%

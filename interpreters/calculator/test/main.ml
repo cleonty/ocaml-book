@@ -29,13 +29,13 @@ let tests = [
   make_i "int" 22 "22"; (*;*)
   make_i "add" 22 "11+11";
   make_i "mul1" 22 "2*11";
+  make_i "mul2" 22 "2+2*10";
+  make_i "mul3" 14 "2*2+10";
+  make_i "mul4" 40 "2*2*10";
   (*
   make_i "adds" 22 "(10+1)+(5+6)";
   make_i "let" 22 "let x=22 in x";
   make_i "lets" 22 "let x = 0 in let x = 22 in x";
-  make_i "mul2" 22 "2+2*10";
-  make_i "mul3" 14 "2*2+10";
-  make_i "mul4" 40 "2*2*10";
   make_i "if1" 22 "if true then 22 else 0";
   make_b "true" true "true";
   make_b "leq" true "1<=1";
