@@ -36,4 +36,9 @@ and step_bop bop e1 e2 = match bop, e1, e2 with
   | Mult, Int a, Int b -> Int (a * b)
   | Leq, Int a, Int b -> Bool (a <= b)
   | _ -> failwith "Operator and operand mismatch"
-  
+
+(** [eval_small e] is the [e -->* v] relation. That is,
+    keep applying [step] until a value is produced. *)
+let rec eval_small (e : expr) : expr =
+  if is_value e then e
+  else e |> step |> eval_small
