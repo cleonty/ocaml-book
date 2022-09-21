@@ -56,8 +56,13 @@ let rec eval_big (e : expr) : expr = match e with
   | Int _ | Bool _ -> e
   | Var _ -> failwith "Unbound variable"
   | Binop (bop, e1, e2) -> eval_bop bop e1 e2
-  | Let (x, e1, e2) -> subst e2 (eval_big e1) x |> eval_big
+  | Let (x, e1, e2) -> eval_let x e1 e2
   | If (e1, e2, e3) -> eval_if e1 e2 e3
+
+and eval_let x e1 e2 = 
+  let v1 = eval_big e1 in
+  let e2' = subst e2 v1 x in
+  eval_big e2'
 
 (** [eval_bop bop e1 e2] is the [e] such that [e1 bop e2 ==> e]. *)
 and eval_bop bop e1 e2 = match bop, eval_big e1, eval_big e2 with
@@ -70,5 +75,6 @@ and eval_bop bop e1 e2 = match bop, eval_big e1, eval_big e2 with
 and eval_if e1 e2 e3 = match eval_big e1 with
   | Bool true -> eval_big e2
   | Bool false -> eval_big e3
-  | _ -> failwith "Guard of if must have type bool"
+  | Int _ -> failwith "Guard of if must have type bool"
+  | _ -> failwith "precondition violated"
   
