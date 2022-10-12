@@ -14,6 +14,7 @@ let rec make_apply e = function
 %}
 
 %token <string> ID
+%token <int> INT
 %token FUN ARROW LPAREN RPAREN EOF
 
 %start <Ast.expr> prog
@@ -32,5 +33,6 @@ expr:
 
 simpl_expr:
 	| x = ID { Var x }
+	| x = INT { Int x }
   | LPAREN; e=expr; RPAREN { e } 
   ;

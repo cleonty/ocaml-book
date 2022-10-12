@@ -3,8 +3,10 @@ open Interp
 open Ast
 open Main
 
-let code_part (Closure (x, e, _)) =
-  Fun (x, e)
+let code_part part = 
+  match part with
+  | (Closure (x, e, _)) -> Fun (x, e)
+  | IntValue v -> Int (v)
 
 (** [make n s1 s2] makes an OUnit test named [n] that expects
     [s2] to evalute to [s1]. *)
@@ -35,7 +37,10 @@ let tests = [
      f (fun a -> a)) \
      (fun c -> c)) \
      (fun y -> x)) \
-     (fun b -> b)"
+     (fun b -> b)";
+  make "integer"
+    "22"
+    "22"
 ]
 
 let _ = run_test_tt_main ("suite" >::: tests)

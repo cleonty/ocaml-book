@@ -18,6 +18,7 @@ type env = value Env.t
     In the environment model, that is a closure. *)
 and value = 
   | Closure of string * expr * env
+  | IntValue of int
 
 let unbound_var_err = "Unbound variable"
 
@@ -29,6 +30,7 @@ let rec eval (env : env) (e : expr) : value = match e with
   | Var x -> eval_var env x
   | App (e1, e2) -> eval_app env e1 e2
   | Fun (x, e) -> Closure (x, e, env)
+  | Int x -> IntValue x
 
 (** [eval_var env x] is the [v] such that [<env, x> ==> v]. *)
 and eval_var env x = 
@@ -46,6 +48,7 @@ and eval_app env e1 e2 =
       let env_for_body = Env.add x v2 base_env_for_body in
       eval env_for_body e
     end
+  | IntValue x -> IntValue x
 
 (** [interp s] interprets [s] by parsing
     and evaluating it with the big-step model,
