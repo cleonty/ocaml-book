@@ -44,7 +44,16 @@ let tests = [
     "22";
   make "true"
     "true"
-    "true"
+    "true";
+  make "2+2=4"
+    "4"
+    "2+2";
+  make "2*2=4"
+    "4"
+    "2*2";
+  make "2+2*2=6"
+    "6"
+    "2+2*2"
 ]
 
 let _ = run_test_tt_main ("suite" >::: tests)

@@ -33,6 +33,12 @@ let rec eval (env : env) (e : expr) : value = match e with
   | Fun (x, e) -> Closure (x, e, env)
   | Int x -> IntValue x
   | Bool v -> BoolValue v
+  | Binop (bop, e1, e2) -> eval_bop env bop e1 e2
+and eval_bop env bop e1 e2 = match bop, eval env e1, eval env e2 with
+  | Add, IntValue a, IntValue b -> IntValue(a + b)
+  | Mult, IntValue a, IntValue b -> IntValue(a * b)
+  | Add, _, _ -> failwith "Operator and operand type mismatch"
+  | Mult, _, _ -> failwith "Operator and operand type mismatch"
 
 (** [eval_var env x] is the [v] such that [<env, x> ==> v]. *)
 and eval_var env x = 

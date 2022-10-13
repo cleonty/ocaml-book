@@ -17,6 +17,8 @@ rule read =
   | "fun" { FUN }
   | "true" { TRUE }
   | "false" { FALSE }
+  | "*" { TIMES }
+  | "+" { PLUS }
   | id { ID (Lexing.lexeme lexbuf) }
   | int { INT (int_of_string (Lexing.lexeme lexbuf)) }
   | eof { EOF }
