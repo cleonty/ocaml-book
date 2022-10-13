@@ -19,6 +19,7 @@ type env = value Env.t
 and value = 
   | Closure of string * expr * env
   | IntValue of int
+  | BoolValue of bool
 
 let unbound_var_err = "Unbound variable"
 
@@ -31,6 +32,7 @@ let rec eval (env : env) (e : expr) : value = match e with
   | App (e1, e2) -> eval_app env e1 e2
   | Fun (x, e) -> Closure (x, e, env)
   | Int x -> IntValue x
+  | Bool v -> BoolValue v
 
 (** [eval_var env x] is the [v] such that [<env, x> ==> v]. *)
 and eval_var env x = 
@@ -49,6 +51,7 @@ and eval_app env e1 e2 =
       eval env_for_body e
     end
   | IntValue x -> IntValue x
+  | BoolValue v -> BoolValue v
 
 (** [interp s] interprets [s] by parsing
     and evaluating it with the big-step model,

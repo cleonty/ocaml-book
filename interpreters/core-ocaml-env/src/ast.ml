@@ -4,3 +4,5 @@ type expr =
   | App of expr * expr
   | Fun of string * expr
   | Int of int
+  | Bool of bool
+
