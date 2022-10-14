@@ -17,6 +17,11 @@ rule read =
   | "fun" { FUN }
   | "true" { TRUE }
   | "false" { FALSE }
+  | "<=" { LEQ }
+  | "<" { LE }
+  | ">=" { GEQ }
+  | ">" { GE }
+  | "=" { EQUALS }
   | "*" { TIMES }
   | "+" { PLUS }
   | id { ID (Lexing.lexeme lexbuf) }

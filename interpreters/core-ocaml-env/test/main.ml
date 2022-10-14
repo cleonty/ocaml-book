@@ -53,7 +53,31 @@ let tests = [
     "2*2";
   make "2+2*2=6"
     "6"
-    "2+2*2"
+    "2+2*2";
+  make "2 < 3"
+    "true"
+    "2 < 3";
+  make "2 <= 3"
+    "true"
+    "2 <= 3";
+  make "3 < 2"
+    "false"
+    "3 < 2";
+  make "3 <= 2"
+    "false"
+    "3 <= 2";
+  make "3 = 2"
+    "false"
+    "3 = 2";
+  make "3 = 3"
+    "true"
+    "3 = 3";
+  make "true = true"
+    "true"
+    "true = true";
+  make "false = false"
+    "true"
+    "false = false"
 ]
 
 let _ = run_test_tt_main ("suite" >::: tests)

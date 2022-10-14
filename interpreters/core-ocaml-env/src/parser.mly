@@ -15,7 +15,7 @@ let rec make_apply e = function
 
 %token <string> ID
 %token <int> INT
-%token FUN ARROW LPAREN RPAREN EOF TRUE FALSE PLUS TIMES
+%token FUN ARROW LPAREN RPAREN EOF TRUE FALSE PLUS TIMES LEQ LE GEQ GE EQUALS
 
 %left PLUS
 %left TIMES
@@ -41,5 +41,10 @@ simpl_expr:
 	| FALSE { Bool false }
 	| e1 = simpl_expr; TIMES; e2 = simpl_expr { Binop (Mult, e1, e2) }
   | e1 = simpl_expr; PLUS; e2 = simpl_expr { Binop (Add, e1, e2) }
+  | e1 = simpl_expr; LE; e2 = simpl_expr { Binop (Le, e1, e2) }
+  | e1 = simpl_expr; LEQ; e2 = simpl_expr { Binop (Leq, e1, e2) }
+  | e1 = simpl_expr; GE; e2 = simpl_expr { Binop (Ge, e1, e2) }
+  | e1 = simpl_expr; GEQ; e2 = simpl_expr { Binop (Geq, e1, e2) }
+  | e1 = simpl_expr; EQUALS; e2 = simpl_expr { Binop (Equals, e1, e2) }
   | LPAREN; e=expr; RPAREN { e } 
   ;

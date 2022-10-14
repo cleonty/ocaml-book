@@ -2,6 +2,11 @@
 type bop =
   | Add
   | Mult
+  | Leq
+  | Le
+  | Geq
+  | Ge
+  | Equals
 
 (** The type of the abstract syntax tree (AST). *)
 type expr =

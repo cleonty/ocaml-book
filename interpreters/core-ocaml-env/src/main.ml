@@ -37,8 +37,19 @@ let rec eval (env : env) (e : expr) : value = match e with
 and eval_bop env bop e1 e2 = match bop, eval env e1, eval env e2 with
   | Add, IntValue a, IntValue b -> IntValue(a + b)
   | Mult, IntValue a, IntValue b -> IntValue(a * b)
+  | Le, IntValue a, IntValue b -> BoolValue(a < b)
+  | Leq, IntValue a, IntValue b -> BoolValue(a <= b)
+  | Ge, IntValue a, IntValue b -> BoolValue(a > b)
+  | Geq, IntValue a, IntValue b -> BoolValue(a >= b)
+  | Equals, IntValue a, IntValue b -> BoolValue(a = b)
+  | Equals, BoolValue a, BoolValue b -> BoolValue(a = b)
   | Add, _, _ -> failwith "Operator and operand type mismatch"
   | Mult, _, _ -> failwith "Operator and operand type mismatch"
+  | Le, _, _ -> failwith "Operator and operand type mismatch"
+  | Leq, _, _ -> failwith "Operator and operand type mismatch"
+  | Ge, _, _ -> failwith "Operator and operand type mismatch"
+  | Geq, _, _ -> failwith "Operator and operand type mismatch"
+  | Equals, _, _ -> failwith "Operator and operand type mismatch"
 
 (** [eval_var env x] is the [v] such that [<env, x> ==> v]. *)
 and eval_var env x = 
