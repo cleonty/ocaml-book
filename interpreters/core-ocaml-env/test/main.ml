@@ -77,7 +77,8 @@ let tests = [
     "true = true";
   make "false = false"
     "true"
-    "false = false"
+    "false = false";
+  make "lets" "22" "let x = 0 in let x = 22 in x"
 ]
 
 let _ = run_test_tt_main ("suite" >::: tests)
