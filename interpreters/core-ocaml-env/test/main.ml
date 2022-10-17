@@ -78,7 +78,13 @@ let tests = [
   make "false = false"
     "true"
     "false = false";
-  make "lets" "22" "let x = 0 in let x = 22 in x"
+  make "lets" "22" "let x = 0 in let x = 22 in x";
+  make "if1" "22" "if true then 22 else 0";
+  make "true" "true" "true";
+  make "leq" "true" "1<=1";
+  make "if2" "22" "if 1+2 <= 3+4 then 22 else 0";
+  make "if3" "22" "if 1+2 <= 3*4 then let x = 22 in x else 0";
+  make "letif" "22" "let x = 1+2 <= 3*4 in if x then 22 else 0"
 ]
 
 let _ = run_test_tt_main ("suite" >::: tests)
