@@ -18,4 +18,7 @@ type expr =
   | Binop of bop * expr * expr
   | Let of string * expr * expr
   | If of expr * expr * expr
+  | Pair of expr * expr
+  | Fst of expr
+  | Snd of expr
 

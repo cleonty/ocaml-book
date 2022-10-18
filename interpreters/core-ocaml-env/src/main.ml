@@ -36,6 +36,9 @@ let rec eval (env : env) (e : expr) : value = match e with
   | Binop (bop, e1, e2) -> eval_bop env bop e1 e2
   | Let (x, e1, e2) -> eval_let env x e1 e2
   | If (e1, e2, e3) -> eval_if env e1 e2 e3
+  | Fst (e) -> eval_fst env e
+  | Snd (e) -> eval_snd env e
+  | Pair (_, _) -> failwith "Pair is not first class value"
 and eval_bop env bop e1 e2 = match bop, eval env e1, eval env e2 with
   | Add, IntValue a, IntValue b -> IntValue(a + b)
   | Mult, IntValue a, IntValue b -> IntValue(a * b)
@@ -60,6 +63,13 @@ and eval_if env e1 e2 e3 = match eval env e1 with
   | BoolValue true -> eval env e2
   | BoolValue false -> eval env e3
   | _ -> failwith "if condition must be boolean"
+and eval_fst env e = match e with
+  | Pair (e1, _) -> eval env e1
+  | _ -> failwith "fst argument must be pair"
+and eval_snd env e = match e with
+  | Pair (_, e2) -> eval env e2
+  | _ -> failwith "snd argument must be pair"
+  
 
 (** [eval_var env x] is the [v] such that [<env, x> ==> v]. *)
 and eval_var env x = 

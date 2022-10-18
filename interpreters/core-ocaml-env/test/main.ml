@@ -84,7 +84,9 @@ let tests = [
   make "leq" "true" "1<=1";
   make "if2" "22" "if 1+2 <= 3+4 then 22 else 0";
   make "if3" "22" "if 1+2 <= 3*4 then let x = 22 in x else 0";
-  make "letif" "22" "let x = 1+2 <= 3*4 in if x then 22 else 0"
+  make "letif" "22" "let x = 1+2 <= 3*4 in if x then 22 else 0";
+  make "fst" "22" "fst (22, 23)";
+  make "snd" "23" "snd (22, 23)";
 ]
 
 let _ = run_test_tt_main ("suite" >::: tests)

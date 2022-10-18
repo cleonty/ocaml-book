@@ -15,14 +15,11 @@ let rec make_apply e = function
 
 %token <string> ID
 %token <int> INT
-%token FUN ARROW LPAREN RPAREN EOF TRUE FALSE PLUS TIMES LEQ LE GEQ GE EQUALS LET IN IF THEN ELSE
+%token FUN ARROW LPAREN RPAREN EOF TRUE FALSE PLUS TIMES LEQ LE GEQ GE EQUALS LET IN IF THEN ELSE FIRST SECOND COMMA
 
 %nonassoc IN
 %nonassoc ELSE
-%left LEQ
-%left LE
-%left GEQ
-%left GE
+%left LEQ LE GEQ GE
 %left EQUALS
 %left PLUS
 %left TIMES
@@ -56,5 +53,8 @@ simpl_expr:
   | e1 = simpl_expr; EQUALS; e2 = simpl_expr { Binop (Equals, e1, e2) }
 	| LET; x = ID; EQUALS; e1 = simpl_expr; IN; e2 = simpl_expr { Let (x, e1, e2) }
 	| IF; e1 = simpl_expr; THEN; e2 = simpl_expr; ELSE; e3 = simpl_expr { If (e1, e2, e3) }
+	| LPAREN; e1 = expr; COMMA; e2 = expr; RPAREN { Pair (e1, e2) } 
+	| FIRST; e = expr { Fst (e) } 
+	| SECOND; e = expr { Snd (e) } 
   | LPAREN; e=expr; RPAREN { e } 
   ;

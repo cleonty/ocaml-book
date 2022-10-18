@@ -13,10 +13,13 @@ rule read =
   | white { read lexbuf }
   | "(" { LPAREN }
   | ")" { RPAREN }
+  | "," { COMMA }
   | "->" { ARROW }
   | "fun" { FUN }
   | "true" { TRUE }
   | "false" { FALSE }
+  | "fst" { FIRST}
+  | "snd" { SECOND }
   | "<=" { LEQ }
   | "<" { LE }
   | ">=" { GEQ }
