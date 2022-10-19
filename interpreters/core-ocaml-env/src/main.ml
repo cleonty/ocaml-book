@@ -20,6 +20,7 @@ and value =
   | Closure of string * expr * env
   | IntValue of int
   | BoolValue of bool
+  | PairValue of value * value
 
 let unbound_var_err = "Unbound variable"
 
@@ -38,7 +39,7 @@ let rec eval (env : env) (e : expr) : value = match e with
   | If (e1, e2, e3) -> eval_if env e1 e2 e3
   | Fst (e) -> eval_fst env e
   | Snd (e) -> eval_snd env e
-  | Pair (_, _) -> failwith "Pair is not first class value"
+  | Pair (e1, e2) -> eval_pair env e1 e2
 and eval_bop env bop e1 e2 = match bop, eval env e1, eval env e2 with
   | Add, IntValue a, IntValue b -> IntValue(a + b)
   | Mult, IntValue a, IntValue b -> IntValue(a * b)
@@ -63,6 +64,7 @@ and eval_if env e1 e2 e3 = match eval env e1 with
   | BoolValue true -> eval env e2
   | BoolValue false -> eval env e3
   | _ -> failwith "if condition must be boolean"
+and eval_pair env e1 e2 = PairValue (eval env e1, eval env e2)
 and eval_fst env e = match e with
   | Pair (e1, _) -> eval env e1
   | _ -> failwith "fst argument must be pair"
@@ -89,6 +91,7 @@ and eval_app env e1 e2 =
     end
   | IntValue x -> IntValue x
   | BoolValue v -> BoolValue v
+  | PairValue (v1, v2) -> PairValue (v1, v2)
 
 (** [interp s] interprets [s] by parsing
     and evaluating it with the big-step model,

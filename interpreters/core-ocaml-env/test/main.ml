@@ -3,11 +3,12 @@ open Interp
 open Ast
 open Main
 
-let code_part part = 
+let rec code_part part = 
   match part with
   | (Closure (x, e, _)) -> Fun (x, e)
   | IntValue v -> Int (v)
   | BoolValue v -> Bool (v)
+  | PairValue (v1, v2) -> Pair(code_part v1, code_part v2)
 
 (** [make n s1 s2] makes an OUnit test named [n] that expects
     [s2] to evalute to [s1]. *)
@@ -87,6 +88,7 @@ let tests = [
   make "letif" "22" "let x = 1+2 <= 3*4 in if x then 22 else 0";
   make "fst" "22" "fst (22, 23)";
   make "snd" "23" "snd (22, 23)";
+  make "pair" "(1, 2)" "(1, 2)";
 ]
 
 let _ = run_test_tt_main ("suite" >::: tests)
