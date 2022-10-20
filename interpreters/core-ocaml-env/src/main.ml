@@ -21,6 +21,8 @@ and value =
   | IntValue of int
   | BoolValue of bool
   | PairValue of value * value
+  | LeftValue of value
+  | RightValue of value
 
 let unbound_var_err = "Unbound variable"
 
@@ -40,6 +42,8 @@ let rec eval (env : env) (e : expr) : value = match e with
   | Fst (e) -> eval_fst env e
   | Snd (e) -> eval_snd env e
   | Pair (e1, e2) -> eval_pair env e1 e2
+  | Left (e) -> LeftValue (eval env e)
+  | Right (e) -> RightValue (eval env e)
 and eval_bop env bop e1 e2 = match bop, eval env e1, eval env e2 with
   | Add, IntValue a, IntValue b -> IntValue(a + b)
   | Mult, IntValue a, IntValue b -> IntValue(a * b)
@@ -92,6 +96,8 @@ and eval_app env e1 e2 =
   | IntValue x -> IntValue x
   | BoolValue v -> BoolValue v
   | PairValue (v1, v2) -> PairValue (v1, v2)
+  | LeftValue (v) -> LeftValue (v)
+  | RightValue (v) -> RightValue (v)
 
 (** [interp s] interprets [s] by parsing
     and evaluating it with the big-step model,

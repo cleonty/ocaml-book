@@ -15,12 +15,12 @@ let rec make_apply e = function
 
 %token <string> ID
 %token <int> INT
-%token FUN ARROW LPAREN RPAREN EOF TRUE FALSE PLUS TIMES LEQ LE GEQ GE EQUALS LET IN IF THEN ELSE FIRST SECOND COMMA
+%token FUN ARROW LPAREN RPAREN EOF TRUE FALSE PLUS TIMES LEQ LE GEQ GE EQUALS LET IN IF THEN ELSE FIRST SECOND COMMA LEFT RIGHT
 
 %nonassoc IN
 %nonassoc ELSE
-%nonassoc FIRST
-%nonassoc SECOND
+%nonassoc FIRST SECOND
+%nonassoc LEFT RIGHT
 %left LEQ LE GEQ GE
 %left EQUALS
 %left PLUS
@@ -57,6 +57,8 @@ simpl_expr:
 	| IF; e1 = simpl_expr; THEN; e2 = simpl_expr; ELSE; e3 = simpl_expr { If (e1, e2, e3) }
 	| LPAREN; e1 = expr; COMMA; e2 = expr; RPAREN { Pair (e1, e2) } 
 	| FIRST; e = simpl_expr { Fst (e) } 
-	| SECOND; e = simpl_expr { Snd (e) } 
+	| SECOND; e = simpl_expr { Snd (e) }
+	| LEFT; e = simpl_expr { Left (e) }
+	| RIGHT; e = simpl_expr { Right (e) }
   | LPAREN; e=expr; RPAREN { e } 
   ;

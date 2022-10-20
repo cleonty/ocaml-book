@@ -9,6 +9,8 @@ let rec code_part part =
   | IntValue v -> Int (v)
   | BoolValue v -> Bool (v)
   | PairValue (v1, v2) -> Pair(code_part v1, code_part v2)
+  | LeftValue (v) -> Left(code_part v)
+  | RightValue (v) -> Right(code_part v)
 
 (** [make n s1 s2] makes an OUnit test named [n] that expects
     [s2] to evalute to [s1]. *)
@@ -89,6 +91,7 @@ let tests = [
   make "fst" "22" "fst (22, 23)";
   make "snd" "23" "snd (22, 23)";
   make "pair" "(1, 2)" "(1, 2)";
+  make "Left and Right" "Left Right 1" "Left Right 1"
 ]
 
 let _ = run_test_tt_main ("suite" >::: tests)
