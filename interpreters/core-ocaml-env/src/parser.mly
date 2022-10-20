@@ -19,8 +19,8 @@ let rec make_apply e = function
 
 %nonassoc IN
 %nonassoc ELSE
-%nonassoc FIRST SECOND
-%nonassoc LEFT RIGHT
+%right FIRST SECOND
+%right LEFT RIGHT
 %left LEQ LE GEQ GE
 %left EQUALS
 %left PLUS
