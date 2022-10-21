@@ -44,6 +44,7 @@ let rec eval (env : env) (e : expr) : value = match e with
   | Pair (e1, e2) -> eval_pair env e1 e2
   | Left (e) -> LeftValue (eval env e)
   | Right (e) -> RightValue (eval env e)
+  | Match(e, x1, e1, x2, e2) -> eval_match env e x1 e1 x2 e2
 and eval_bop env bop e1 e2 = match bop, eval env e1, eval env e2 with
   | Add, IntValue a, IntValue b -> IntValue(a + b)
   | Mult, IntValue a, IntValue b -> IntValue(a * b)
@@ -75,7 +76,10 @@ and eval_fst env e = match e with
 and eval_snd env e = match e with
   | Pair (_, e2) -> eval env e2
   | _ -> failwith "snd argument must be pair"
-  
+and eval_match env e x1 e1 x2 e2 = match eval env e with
+  | LeftValue v -> let env_with_x1 = Env.add x1 v env in eval env_with_x1 e1
+  | RightValue v -> let env_with_x2 = Env.add x2 v env in eval env_with_x2 e2
+  | _ -> failwith "match allowed only against Left and Right"
 
 (** [eval_var env x] is the [v] such that [<env, x> ==> v]. *)
 and eval_var env x = 

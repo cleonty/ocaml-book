@@ -91,7 +91,9 @@ let tests = [
   make "fst" "22" "fst (22, 23)";
   make "snd" "23" "snd (22, 23)";
   make "pair" "(1, 2)" "(1, 2)";
-  make "Left and Right" "Left (Right 1)" "Left (Right 1)"
+  make "Left and Right" "Left (Right 1)" "Left (Right 1)";
+  make "match Left simple" "1" "match Left 2 with Left x -> 1 | Right x -> 2";
+  make "match Left" "3" "match Left 2 with Left x -> x + 1 | Right x -> x - 1";
 ]
 
 let _ = run_test_tt_main ("suite" >::: tests) 
