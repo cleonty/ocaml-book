@@ -93,6 +93,7 @@ let tests = [
   make "pair" "(1, 2)" "(1, 2)";
   make "Left and Right" "Left (Right 1)" "Left (Right 1)";
   make "match Left simple" "1" "match Left 2 with Left x -> 1 | Right x -> 2";
+  make "very simple match" "2" "match Left 2 with Left x -> x | Right x -> x";
   make "match Left" "3" "match Left 2 with Left x -> x + 1 | Right x -> x - 1";
 ]
 
