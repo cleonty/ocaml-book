@@ -26,6 +26,7 @@ rule read =
   | ">" { GE }
   | "=" { EQUALS }
   | "*" { TIMES }
+  | "/" { DIV }
   | "+" { PLUS }
   | "-" { MINUS }
   | "let" { LET }

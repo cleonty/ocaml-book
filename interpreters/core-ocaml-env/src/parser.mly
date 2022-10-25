@@ -15,7 +15,7 @@ let rec make_apply e = function
 
 %token <string> ID
 %token <int> INT
-%token FUN ARROW LPAREN RPAREN EOF TRUE FALSE PLUS MINUS TIMES LEQ LE GEQ GE EQUALS LET IN IF THEN ELSE FIRST SECOND COMMA LEFT RIGHT MATCH WITH ALT
+%token FUN ARROW LPAREN RPAREN EOF TRUE FALSE PLUS MINUS TIMES DIV LEQ LE GEQ GE EQUALS LET IN IF THEN ELSE FIRST SECOND COMMA LEFT RIGHT MATCH WITH ALT
 
 %nonassoc IN
 %nonassoc ELSE
@@ -25,7 +25,7 @@ let rec make_apply e = function
 %left LEQ LE GEQ GE
 %left EQUALS
 %left PLUS MINUS
-%left TIMES
+%left TIMES DIV
 
 %start <Ast.expr> prog
 
@@ -48,6 +48,7 @@ simpl_expr:
 	| TRUE { Bool true }
 	| FALSE { Bool false }
 	| e1 = simpl_expr; TIMES; e2 = simpl_expr { Binop (Mult, e1, e2) }
+	| e1 = simpl_expr; DIV; e2 = simpl_expr { Binop (Div, e1, e2) }
   | e1 = simpl_expr; PLUS; e2 = simpl_expr { Binop (Add, e1, e2) }
   | e1 = simpl_expr; MINUS; e2 = simpl_expr { Binop (Sub, e1, e2) }
   | e1 = simpl_expr; LE; e2 = simpl_expr { Binop (Le, e1, e2) }

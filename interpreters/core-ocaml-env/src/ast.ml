@@ -3,6 +3,7 @@ type bop =
   | Add
   | Sub
   | Mult
+  | Div
   | Leq
   | Le
   | Geq

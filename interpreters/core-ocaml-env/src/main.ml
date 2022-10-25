@@ -49,6 +49,7 @@ and eval_bop env bop e1 e2 = match bop, eval env e1, eval env e2 with
   | Add, IntValue a, IntValue b -> IntValue(a + b)
   | Sub, IntValue a, IntValue b -> IntValue(a - b)
   | Mult, IntValue a, IntValue b -> IntValue(a * b)
+  | Div, IntValue a, IntValue b -> IntValue(a / b)
   | Le, IntValue a, IntValue b -> BoolValue(a < b)
   | Leq, IntValue a, IntValue b -> BoolValue(a <= b)
   | Ge, IntValue a, IntValue b -> BoolValue(a > b)
@@ -58,6 +59,7 @@ and eval_bop env bop e1 e2 = match bop, eval env e1, eval env e2 with
   | Add, _, _ -> failwith "Operator and operand type mismatch"
   | Sub, _, _ -> failwith "Operator and operand type mismatch"
   | Mult, _, _ -> failwith "Operator and operand type mismatch"
+  | Div, _, _ -> failwith "Operator and operand type mismatch"
   | Le, _, _ -> failwith "Operator and operand type mismatch"
   | Leq, _, _ -> failwith "Operator and operand type mismatch"
   | Ge, _, _ -> failwith "Operator and operand type mismatch"
