@@ -1,6 +1,7 @@
 (** The type for the Binary operator nodes in AST  *)
 type bop =
   | Add
+  | Sub
   | Mult
   | Leq
   | Le

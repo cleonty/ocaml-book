@@ -27,6 +27,7 @@ rule read =
   | "=" { EQUALS }
   | "*" { TIMES }
   | "+" { PLUS }
+  | "-" { MINUS }
   | "let" { LET }
   | "in" { IN }
   | "if" { IF }
