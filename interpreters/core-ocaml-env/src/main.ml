@@ -37,6 +37,7 @@ let rec eval (env : env) (e : expr) : value = match e with
   | Int x -> IntValue x
   | Bool v -> BoolValue v
   | Binop (bop, e1, e2) -> eval_bop env bop e1 e2
+  | Unop (unop, e) -> eval_unop env unop e
   | Let (x, e1, e2) -> eval_let env x e1 e2
   | If (e1, e2, e3) -> eval_if env e1 e2 e3
   | Fst (e) -> eval_fst env e
@@ -65,6 +66,12 @@ and eval_bop env bop e1 e2 = match bop, eval env e1, eval env e2 with
   | Ge, _, _ -> failwith "Operator and operand type mismatch"
   | Geq, _, _ -> failwith "Operator and operand type mismatch"
   | Equals, _, _ -> failwith "Operator and operand type mismatch"
+  and eval_unop env unop e = match unop, eval env e with
+  | Uplus, IntValue a -> IntValue(a)
+  | Uminus, IntValue a -> IntValue(-a)
+  | Uplus, _ -> failwith "Operator and operand type mismatch"
+  | Uminus, _ -> failwith "Operator and operand type mismatch"
+
 and eval_let env x e1 e2 = 
   let v1 = eval env e1 in
   let env_for_let = Env.add x v1 env in

@@ -26,6 +26,7 @@ let rec make_apply e = function
 %left EQUALS
 %left PLUS MINUS
 %left TIMES DIV
+%nonassoc UMINUS UPLUS
 
 %start <Ast.expr> prog
 
@@ -56,6 +57,8 @@ simpl_expr:
   | e1 = simpl_expr; GE; e2 = simpl_expr { Binop (Ge, e1, e2) }
   | e1 = simpl_expr; GEQ; e2 = simpl_expr { Binop (Geq, e1, e2) }
   | e1 = simpl_expr; EQUALS; e2 = simpl_expr { Binop (Equals, e1, e2) }
+	| MINUS; e = simpl_expr %prec UMINUS { Unop (Uminus, e) }
+	| PLUS; e = simpl_expr %prec UPLUS { Unop (Uplus, e) }
 	| LET; x = ID; EQUALS; e1 = simpl_expr; IN; e2 = simpl_expr { Let (x, e1, e2) }
 	| IF; e1 = simpl_expr; THEN; e2 = simpl_expr; ELSE; e3 = simpl_expr { If (e1, e2, e3) }
 	| LPAREN; e1 = expr; COMMA; e2 = expr; RPAREN { Pair (e1, e2) } 
