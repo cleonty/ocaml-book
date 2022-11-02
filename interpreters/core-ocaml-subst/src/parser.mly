@@ -14,7 +14,36 @@ let rec make_apply e = function
 %}
 
 %token <string> ID
-%token FUN ARROW LPAREN RPAREN EOF
+%token <int> INT
+%token FUN
+%token ARROW
+%token LPAREN
+%token RPAREN
+%token EOF
+%token TRUE
+%token FALSE
+%token PLUS
+%token MINUS
+%token TIMES
+%token DIV
+%token LEQ
+%token LE
+%token GEQ
+%token GE
+%token EQUALS
+%token LET
+%token IN
+%token IF
+%token THEN
+%token ELSE
+%token FIRST
+%token SECOND
+%token COMMA
+%token LEFT
+%token RIGHT
+%token MATCH
+%token WITH
+%token ALT
 
 %start <Ast.expr> prog
 
@@ -32,5 +61,17 @@ expr:
 
 simpl_expr:
 	| x = ID { Var x }
+	| x = INT { Int x }
+	| TRUE { Bool true }
+	| FALSE { Bool false }
+	| e1 = simpl_expr; TIMES; e2 = simpl_expr { Binop (Mult, e1, e2) }
+	| e1 = simpl_expr; DIV; e2 = simpl_expr { Binop (Div, e1, e2) }
+  | e1 = simpl_expr; PLUS; e2 = simpl_expr { Binop (Add, e1, e2) }
+  | e1 = simpl_expr; MINUS; e2 = simpl_expr { Binop (Sub, e1, e2) }
+  | e1 = simpl_expr; LE; e2 = simpl_expr { Binop (Le, e1, e2) }
+  | e1 = simpl_expr; LEQ; e2 = simpl_expr { Binop (Leq, e1, e2) }
+  | e1 = simpl_expr; GE; e2 = simpl_expr { Binop (Ge, e1, e2) }
+  | e1 = simpl_expr; GEQ; e2 = simpl_expr { Binop (Geq, e1, e2) }
+  | e1 = simpl_expr; EQUALS; e2 = simpl_expr { Binop (Equals, e1, e2) }
   | LPAREN; e=expr; RPAREN { e } 
   ;

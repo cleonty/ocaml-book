@@ -9,7 +9,10 @@ let parse (s : string) : expr =
 (** [is_value e] is whether [e] is a value. *)
 let is_value : expr -> bool = function
   | Fun _ -> true
+  | Int _ -> true
+  | Bool _ -> true
   | Var _ | App _ -> false
+  | Binop (_, _, _) -> false
 
 module VarSet = Set.Make(String)
 let singleton = VarSet.singleton
