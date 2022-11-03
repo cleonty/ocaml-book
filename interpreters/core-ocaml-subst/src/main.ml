@@ -8,10 +8,11 @@ let parse (s : string) : expr =
 
 (** [is_value e] is whether [e] is a value. *)
 let is_value : expr -> bool = function
+  | Var _ -> false 
+  | App _ -> false
   | Fun _ -> true
   | Int _ -> true
   | Bool _ -> true
-  | Var _ | App _ -> false
   | Binop (_, _, _) -> false
 
 module VarSet = Set.Make(String)
@@ -19,12 +20,16 @@ let singleton = VarSet.singleton
 let union = VarSet.union
 let diff = VarSet.diff
 let mem = VarSet.mem
+let empty = VarSet.empty
 
 (** [fv e] is a set-like list of the free variables of [e]. *)
 let rec fv : expr -> VarSet.t = function
   | Var x -> singleton x
   | App (e1, e2) -> union (fv e1) (fv e2)
   | Fun (x, e) -> diff (fv e) (singleton x)
+  | Int _ -> empty
+  | Bool _ -> empty
+  | Binop (_, e1, e2) -> union (fv e1) (fv e2)
 
 (** [gensym ()] is a fresh variable name. *)
 let gensym =
@@ -38,6 +43,9 @@ let rec replace e y x = match e with
   | Var z -> if z = x then Var y else e
   | App (e1, e2) -> App (replace e1 y x, replace e2 y x)
   | Fun (z, e') -> Fun ((if z = x then y else z), replace e' y x)
+  | Int i -> Int i
+  | Bool b -> Bool b
+  | Binop (bop, e1, e2) -> Binop(bop, replace e1 y x, replace e2 y x)
 
 (** [subst e v x] is [e] with [v] substituted for [x], that
     is, [e{v/x}]. *)
@@ -51,6 +59,9 @@ let rec subst e v x = match e with
       let fresh = gensym () in
       let new_body = replace e' y fresh in
       Fun (fresh, subst new_body v x)
+  | Int i -> Int i
+  | Bool b -> Bool b
+  | Binop (bop, e1, e2) -> Binop(bop, subst e1 v x, subst e2 v x)
 
 let unbound_var_err = "Unbound variable"
 let apply_non_fn_err = "Cannot apply non-function"
@@ -63,6 +74,9 @@ let rec eval (e : expr) : expr = match e with
   | Var _ -> failwith unbound_var_err
   | App (e1, e2) -> eval_app e1 e2
   | Fun _ -> e
+  | Int i -> Int i
+  | Bool b -> Bool b
+  | Binop (bop, e1, e2) -> eval_bop bop e1 e2
 
 (** [eval_app e1 e2] is the [e] such that [e1 e2 ==> e]. *)
 and eval_app e1 e2 = match eval e1 with
@@ -73,6 +87,28 @@ and eval_app e1 e2 = match eval e1 with
       | CBN -> e2
     in subst e e2' x |> eval
   | _ -> failwith apply_non_fn_err
+
+(** [eval_bop e1 e2] is the [e] such that [e1 bop e2 ==> e]. *)
+and eval_bop bop e1 e2 = match bop, eval e1, eval e2 with
+| Add, Int i1, Int i2 -> Int (i1 + i2)
+| Sub, Int i1, Int i2 -> Int (i1 - i2)
+| Mult, Int i1, Int i2 -> Int (i1 * i2)
+| Div, Int i1, Int i2 -> Int (i1 / i2)
+| Leq, Int i1, Int i2 -> Bool (i1 <= i2)
+| Le, Int i1, Int i2 -> Bool (i1 < i2)
+| Geq, Int i1, Int i2 -> Bool (i1 >= i2)
+| Ge, Int i1, Int i2 -> Bool (i1 > i2)
+| Equals, Int i1, Int i2 -> Bool (i1 == i2)
+| Equals, Bool b1, Bool b2 -> Bool (b1 == b2)
+| Add, _, _ -> failwith "operator and operands type mismatch"
+| Sub, _, _ -> failwith "operator and operands type mismatch"
+| Mult, _, _ -> failwith "operator and operands type mismatch"
+| Div, _, _ -> failwith "operator and operands type mismatch"
+| Leq, _, _ -> failwith "operator and operands type mismatch"
+| Le, _, _ -> failwith "operator and operands type mismatch"
+| Geq, _, _ -> failwith "operator and operands type mismatch"
+| Ge, _, _ -> failwith "operator and operands type mismatch"
+| Equals, _, _ -> failwith "operator and operands type mismatch"
 
 (** [interp s] interprets [s] by parsing
     and evaluating it with the big-step model. *)

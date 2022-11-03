@@ -45,6 +45,11 @@ let rec make_apply e = function
 %token WITH
 %token ALT
 
+%left LEQ LE GEQ GE
+%left EQUALS
+%left PLUS MINUS
+%left TIMES DIV
+
 %start <Ast.expr> prog
 
 %%

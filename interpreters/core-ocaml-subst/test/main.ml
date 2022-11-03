@@ -22,6 +22,8 @@ let tests = [
   make_unbound_err "capture avoiding correct"
     "((fun x -> (fun z -> x)) z) (fun x -> x)";
   make "integer" "1" "1";
+  make "arithmetic" "6" "2 + 2 * 2";
+  make "arithmetic2" "8" "1 + 2 * 2 + 3";
 ]
 
 let _ = run_test_tt_main ("suite" >::: tests)
