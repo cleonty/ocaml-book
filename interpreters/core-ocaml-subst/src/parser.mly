@@ -45,6 +45,7 @@ let rec make_apply e = function
 %token WITH
 %token ALT
 
+%nonassoc ELSE IN
 %left LEQ LE GEQ GE
 %left EQUALS
 %left PLUS MINUS
@@ -78,5 +79,7 @@ simpl_expr:
   | e1 = simpl_expr; GE; e2 = simpl_expr { Binop (Ge, e1, e2) }
   | e1 = simpl_expr; GEQ; e2 = simpl_expr { Binop (Geq, e1, e2) }
   | e1 = simpl_expr; EQUALS; e2 = simpl_expr { Binop (Equals, e1, e2) }
+	| LET; x = ID; EQUALS; e1 = simpl_expr; IN; e2 = simpl_expr { Let (x, e1, e2) }
+	| IF; e1 = simpl_expr; THEN; e2 = simpl_expr; ELSE; e3 = simpl_expr { If (e1, e2, e3) }
   | LPAREN; e=expr; RPAREN { e } 
   ;

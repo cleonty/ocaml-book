@@ -14,6 +14,8 @@ let is_value : expr -> bool = function
   | Int _ -> true
   | Bool _ -> true
   | Binop (_, _, _) -> false
+  | Let (_, _, _) -> false
+  | If (_, _, _) -> false
 
 module VarSet = Set.Make(String)
 let singleton = VarSet.singleton
@@ -30,6 +32,8 @@ let rec fv : expr -> VarSet.t = function
   | Int _ -> empty
   | Bool _ -> empty
   | Binop (_, e1, e2) -> union (fv e1) (fv e2)
+  | Let (x, e1, e2) -> union (fv e1) (diff (fv e2) (singleton x))
+  | If (e1, e2, e3) -> union (fv e1) (union (fv e2) (fv e3)) 
 
 (** [gensym ()] is a fresh variable name. *)
 let gensym =
@@ -46,6 +50,8 @@ let rec replace e y x = match e with
   | Int i -> Int i
   | Bool b -> Bool b
   | Binop (bop, e1, e2) -> Binop(bop, replace e1 y x, replace e2 y x)
+  | Let (x, e1, e2) -> Let (y, replace e1 y x, replace e2 y x)
+  | If (e1, e2, e3) -> If (replace e1 y x, replace e2 y x, replace e3 y x)
 
 (** [subst e v x] is [e] with [v] substituted for [x], that
     is, [e{v/x}]. *)
@@ -62,6 +68,15 @@ let rec subst e v x = match e with
   | Int i -> Int i
   | Bool b -> Bool b
   | Binop (bop, e1, e2) -> Binop(bop, subst e1 v x, subst e2 v x)
+  | Let (y, e1, e2) -> 
+    if x = y then Let (x, subst e1 v x, e2)
+    else if not (mem y (fv v)) then Let (y, subst e1 v x, subst e2 v x)
+    else
+      let fresh = gensym () in
+      let new_e1 = replace e1 y fresh in
+      let new_e2 = replace e2 y fresh in
+      Let (fresh, subst new_e1 v x, subst new_e2 v x)
+  | If (e1, e2, e3) -> If (subst e1 v x, subst e2 v x, subst e3 v x)
 
 let unbound_var_err = "Unbound variable"
 let apply_non_fn_err = "Cannot apply non-function"
@@ -77,6 +92,8 @@ let rec eval (e : expr) : expr = match e with
   | Int i -> Int i
   | Bool b -> Bool b
   | Binop (bop, e1, e2) -> eval_bop bop e1 e2
+  | Let (x, e1, e2) -> eval_let x e1 e2
+  | If (e1, e2, e3) -> eval_if e1 e2 e3
 
 (** [eval_app e1 e2] is the [e] such that [e1 e2 ==> e]. *)
 and eval_app e1 e2 = match eval e1 with
@@ -87,6 +104,15 @@ and eval_app e1 e2 = match eval e1 with
       | CBN -> e2
     in subst e e2' x |> eval
   | _ -> failwith apply_non_fn_err
+
+(** [eval_let x e1 e2] is the [e] such that [let x = e1 in e2 ==> e]. *)
+and eval_let x e1 e2 = subst e2 (eval e1) x
+
+(** [eval_if e1 e2 e3] is the [e] such that [if e1 then e2 else e3 ==> e]. *)
+and eval_if e1 e2 e3 = match eval e1 with
+  | Bool (true) -> eval e2
+  | Bool (false) -> eval e3
+  | _ -> failwith "not boolean IF condition" 
 
 (** [eval_bop e1 e2] is the [e] such that [e1 bop e2 ==> e]. *)
 and eval_bop bop e1 e2 = match bop, eval e1, eval e2 with
