@@ -46,6 +46,7 @@ let rec make_apply e = function
 %token ALT
 
 %nonassoc ELSE IN
+%nonassoc ARROW
 %left LEQ LE GEQ GE
 %left EQUALS
 %left PLUS MINUS

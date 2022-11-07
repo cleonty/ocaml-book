@@ -17,6 +17,29 @@ let is_value : expr -> bool = function
   | Let (_, _, _) -> false
   | If (_, _, _) -> false
 
+(** [string_of_expr e] is string that represents [e]. *)
+let rec string_of_expr : expr -> string = function
+  | Var x -> x 
+  | App (e1, e2) -> (string_of_expr e1) ^ " " ^  (string_of_expr e2)
+  | Fun (x, e) -> "fun " ^ x ^ " -> " ^ string_of_expr e 
+  | Int i -> string_of_int i
+  | Bool b -> string_of_bool b
+  | Binop (bop, e1, e2) -> (string_of_expr e1) ^ " " ^ (string_of_bop bop) ^ " " ^ (string_of_expr e2)
+  | Let (x, e1, e2) -> "let " ^ x ^ " = " ^ (string_of_expr e1) ^ " in " ^ (string_of_expr e2) 
+  | If (e1, e2, e3) -> "if " ^ (string_of_expr e1) ^ " then " ^ (string_of_expr e2) ^ " else " ^ (string_of_expr e3)
+
+(** [string_of_expr e] is string that represents [e]. *)
+and string_of_bop : bop -> string = function
+  | Add -> "+"
+  | Sub -> "-"
+  | Mult -> "*"
+  | Div -> "/"
+  | Leq -> "<="
+  | Le -> "<"
+  | Geq -> ">="
+  | Ge -> ">"
+  | Equals -> "="
+
 module VarSet = Set.Make(String)
 let singleton = VarSet.singleton
 let union = VarSet.union
@@ -106,7 +129,12 @@ and eval_app e1 e2 = match eval e1 with
   | _ -> failwith apply_non_fn_err
 
 (** [eval_let x e1 e2] is the [e] such that [let x = e1 in e2 ==> e]. *)
-and eval_let x e1 e2 = subst e2 (eval e1) x
+and eval_let x e1 e2 = 
+  let _ = print_endline (string_of_expr e1) in
+  let _ = print_endline (string_of_expr e2) in
+  let e1'= eval e1 in
+  let _ = print_endline (string_of_expr e1') in
+  let e1' = eval e1 in subst e2 e1' x
 
 (** [eval_if e1 e2 e3] is the [e] such that [if e1 then e2 else e3 ==> e]. *)
 and eval_if e1 e2 e3 = match eval e1 with
