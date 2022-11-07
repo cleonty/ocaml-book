@@ -130,11 +130,7 @@ and eval_app e1 e2 = match eval e1 with
 
 (** [eval_let x e1 e2] is the [e] such that [let x = e1 in e2 ==> e]. *)
 and eval_let x e1 e2 = 
-  let _ = print_endline (string_of_expr e1) in
-  let _ = print_endline (string_of_expr e2) in
-  let e1'= eval e1 in
-  let _ = print_endline (string_of_expr e1') in
-  let e1' = eval e1 in subst e2 e1' x
+  let e1' = eval e1 in eval (subst e2 e1' x)
 
 (** [eval_if e1 e2 e3] is the [e] such that [if e1 then e2 else e3 ==> e]. *)
 and eval_if e1 e2 e3 = match eval e1 with
