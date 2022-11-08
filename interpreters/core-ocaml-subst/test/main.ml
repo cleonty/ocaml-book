@@ -70,6 +70,9 @@ let tests = [
   make "subtract" "0" "(fun x -> x - 1) 1";
   make "div" "2" "(fun x -> x / 2) 4";
   make "letif" "22" "let x = 1+2 <= 3*4 in if x then 22 else 0";
+  make "fst" "22" "fst (22, 23)";
+  make "snd" "23" "snd (22, 23)";
+  make "pair" "(1, 2)" "(1, 2)";
 ]
 
 let _ = run_test_tt_main ("suite" >::: tests)
