@@ -30,7 +30,7 @@ rule read =
   | "-" { MINUS }
   | "if" { IF }
   | "then" { THEN }
-  | "else" { THEN }
+  | "else" { ELSE }
   | "let" { LET }
   | "in" { IN }
   | id { ID (Lexing.lexeme lexbuf) }
