@@ -47,6 +47,8 @@ let rec make_apply e = function
 
 %nonassoc ELSE IN
 %nonassoc ARROW
+%nonassoc LEFT RIGHT
+%nonassoc FIRST SECOND
 %left LEQ LE GEQ GE
 %left EQUALS
 %left PLUS MINUS
