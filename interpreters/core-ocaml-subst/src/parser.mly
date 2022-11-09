@@ -85,5 +85,7 @@ simpl_expr:
 	| LPAREN; e1 = expr; COMMA; e2 = expr; RPAREN { Pair (e1, e2) }
 	| FIRST; e = simpl_expr { Fst (e) } 
 	| SECOND; e = simpl_expr { Snd (e) }
+	| LEFT; e = simpl_expr { Left (e) }
+	| RIGHT; e = simpl_expr { Right (e) }
   | LPAREN; e=expr; RPAREN { e } 
   ;

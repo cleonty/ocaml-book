@@ -34,6 +34,8 @@ rule read =
   | "let" { LET }
   | "in" { IN }
   | "," { COMMA }
+  | "Left" { LEFT }
+  | "Right" { RIGHT }
   | id { ID (Lexing.lexeme lexbuf) }
   | int { INT (int_of_string (Lexing.lexeme lexbuf)) }
   | eof { EOF }

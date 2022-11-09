@@ -23,3 +23,5 @@ type expr =
   | Pair of expr * expr
   | Fst of expr
   | Snd of expr
+  | Left of expr
+  | Right of expr

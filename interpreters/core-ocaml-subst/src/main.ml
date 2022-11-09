@@ -19,6 +19,8 @@ let is_value : expr -> bool = function
   | Pair (_, _) -> true
   | Fst _  -> false
   | Snd _  -> false
+  | Left _ -> true
+  | Right _ -> true
 
 (** [string_of_expr e] is string that represents [e]. *)
 let rec string_of_expr : expr -> string = function
@@ -33,6 +35,8 @@ let rec string_of_expr : expr -> string = function
   | Pair (e1, e2) -> "(" ^ (string_of_expr e1) ^ ", " ^ (string_of_expr e2) ^ ")"
   | Fst (e) -> "fst (" ^ (string_of_expr e) ^ ")"
   | Snd (e) -> "snd (" ^ (string_of_expr e) ^ ")"
+  | Left (e) -> "Left (" ^ (string_of_expr e) ^ ")"
+  | Right (e) -> "Right (" ^ (string_of_expr e) ^ ")"
 
 (** [string_of_expr e] is string that represents [e]. *)
 and string_of_bop : bop -> string = function
@@ -66,6 +70,8 @@ let rec fv : expr -> VarSet.t = function
   | Pair (e1, e2) -> union (fv e1) (fv e2)
   | Fst (e) -> (fv e)
   | Snd (e) -> (fv e)
+  | Left (e) -> (fv e)
+  | Right (e) -> (fv e)
 
 (** [gensym ()] is a fresh variable name. *)
 let gensym =
@@ -87,6 +93,8 @@ let rec replace e y x = match e with
   | Pair (e1, e2) -> Pair (replace e1 y x, replace e2 y x)
   | Fst (e) -> Fst (replace e y x)
   | Snd (e) -> Snd (replace e y x)
+  | Left (e) -> Left (replace e y x)
+  | Right (e) -> Right (replace e y x)
 
 (** [subst e v x] is [e] with [v] substituted for [x], that
     is, [e{v/x}]. *)
@@ -115,6 +123,8 @@ let rec subst e v x = match e with
   | Pair (e1, e2) -> Pair (subst e1 v x, subst e2 v x)
   | Fst (e) -> Fst (subst e v x)
   | Snd (e) -> Snd (subst e v x)
+  | Left (e) -> Left (subst e v x)
+  | Right (e) -> Right (subst e v x)
 
 let unbound_var_err = "Unbound variable"
 let apply_non_fn_err = "Cannot apply non-function"
@@ -135,6 +145,8 @@ let rec eval (e : expr) : expr = match e with
   | Pair (e1, e2) -> Pair (eval e1, eval e2)
   | Fst (e) -> eval_fst e
   | Snd (e) -> eval_snd e
+  | Left (e) -> Left (eval e)
+  | Right (e) -> Right (eval e)
 
 (** [eval_app e1 e2] is the [e] such that [e1 e2 ==> e]. *)
 and eval_app e1 e2 = match eval e1 with

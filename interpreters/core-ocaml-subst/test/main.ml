@@ -73,6 +73,9 @@ let tests = [
   make "fst" "22" "fst (22, 23)";
   make "snd" "23" "snd (22, 23)";
   make "pair" "(1, 2)" "(1, 2)";
+  make "left" "Left(1)" "Left(1)";
+  make "right" "Right(1)" "Right(1)";
+  make "left_plus" "Left(3)" "Left(1+2)";
 ]
 
 let _ = run_test_tt_main ("suite" >::: tests)
