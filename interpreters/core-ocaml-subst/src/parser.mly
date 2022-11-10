@@ -89,5 +89,6 @@ simpl_expr:
 	| SECOND; e = simpl_expr { Snd (e) }
 	| LEFT; e = simpl_expr { Left (e) }
 	| RIGHT; e = simpl_expr { Right (e) }
+	| MATCH; e = simpl_expr; WITH; LEFT; x1 = ID; ARROW; e1 = simpl_expr; ALT; RIGHT; x2 = ID; ARROW; e2 = simpl_expr { Match (e, x1, e1, x2, e2) }
   | LPAREN; e=expr; RPAREN { e } 
   ;

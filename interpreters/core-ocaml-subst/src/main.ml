@@ -21,6 +21,7 @@ let is_value : expr -> bool = function
   | Snd _  -> false
   | Left _ -> true
   | Right _ -> true
+  | Match (_, _, _, _, _) -> false
 
 (** [string_of_expr e] is string that represents [e]. *)
 let rec string_of_expr : expr -> string = function
@@ -37,6 +38,7 @@ let rec string_of_expr : expr -> string = function
   | Snd (e) -> "snd (" ^ (string_of_expr e) ^ ")"
   | Left (e) -> "Left (" ^ (string_of_expr e) ^ ")"
   | Right (e) -> "Right (" ^ (string_of_expr e) ^ ")"
+  | Match (e, x1, e1, x2, e2) -> "Match " ^ (string_of_expr e) ^ " with " ^ x1 ^ " -> " ^ (string_of_expr e1) ^ " | " ^ x2 ^ " -> " ^ (string_of_expr e2)
 
 (** [string_of_expr e] is string that represents [e]. *)
 and string_of_bop : bop -> string = function
@@ -56,6 +58,9 @@ let union = VarSet.union
 let diff = VarSet.diff
 let mem = VarSet.mem
 let empty = VarSet.empty
+let inter = VarSet.inter
+let disjoint = VarSet.disjoint
+let is_empty = VarSet.is_empty
 
 (** [fv e] is a set-like list of the free variables of [e]. *)
 let rec fv : expr -> VarSet.t = function
@@ -72,6 +77,15 @@ let rec fv : expr -> VarSet.t = function
   | Snd (e) -> (fv e)
   | Left (e) -> (fv e)
   | Right (e) -> (fv e)
+  | Match (e, x1, e1, x2, e2) -> fv_match e x1 e1 x2 e2
+
+and fv_match e x1 e1 x2 e2 = 
+  let d1 = diff (fv e1) (singleton x1) in 
+  let d2 = diff (fv e2) (singleton x2) in 
+  let fve = fv e in
+  let fvd = union d1 d2 in
+  union fve fvd 
+   
 
 (** [gensym ()] is a fresh variable name. *)
 let gensym =
@@ -95,6 +109,7 @@ let rec replace e y x = match e with
   | Snd (e) -> Snd (replace e y x)
   | Left (e) -> Left (replace e y x)
   | Right (e) -> Right (replace e y x)
+  | Match (e, x1, e1, x2, e2) -> Match (replace e y x, x1, replace e1 y x, x2, replace e2 y x)
 
 (** [subst e v x] is [e] with [v] substituted for [x], that
     is, [e{v/x}]. *)
@@ -125,6 +140,14 @@ let rec subst e v x = match e with
   | Snd (e) -> Snd (subst e v x)
   | Left (e) -> Left (subst e v x)
   | Right (e) -> Right (subst e v x)
+  | Match (e, x1, e1, x2, e2) ->
+    let fvv = fv (v) in
+    let sx1 = singleton(x1) in
+    let sx2 = singleton(x2) in
+    if disjoint (union sx1 sx2) fvv then Match (subst e v x, x1, subst e1 v x, x2, subst e2 v x)
+    else if disjoint sx2 fvv then Match (subst e v x, x, e1, x2, subst e2 v x)
+    else if disjoint sx1 fvv then Match (subst e v x, x1, subst e1 v x, x, e2)
+    else Match (subst e v x, x, e1, x, e2)
 
 let unbound_var_err = "Unbound variable"
 let apply_non_fn_err = "Cannot apply non-function"
@@ -147,6 +170,7 @@ let rec eval (e : expr) : expr = match e with
   | Snd (e) -> eval_snd e
   | Left (e) -> Left (eval e)
   | Right (e) -> Right (eval e)
+  | Match (e, x1, e1, x2, e2) -> eval_match e x1 e1 x2 e2 
 
 (** [eval_app e1 e2] is the [e] such that [e1 e2 ==> e]. *)
 and eval_app e1 e2 = match eval e1 with
@@ -177,6 +201,12 @@ and eval_fst e = match eval e with
 and eval_snd e = match eval e with
   | Pair (_, e2) -> eval e2
   | _ -> failwith "operand of snd is not a pair" 
+
+(** [eval_match e x1 e1 x2 e2 ] is the [e'] such that [match e with Left x1 -> e1 | Right x2 -> e2  ==> e']. *)
+and eval_match e x1 e1 x2 e2 = match eval e with
+    | Left v1 -> eval (subst e1 v1 x1)
+    | Right v2 -> eval (subst e2 v2 x2)
+    | _ -> failwith "match not against Left or Right"
 
 (** [eval_bop e1 e2] is the [e] such that [e1 bop e2 ==> e]. *)
 and eval_bop bop e1 e2 = match bop, eval e1, eval e2 with
