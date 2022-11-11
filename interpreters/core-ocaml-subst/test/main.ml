@@ -76,6 +76,11 @@ let tests = [
   make "left" "Left(1)" "Left(1)";
   make "right" "Right(1)" "Right(1)";
   make "left_plus" "Left(3)" "Left(1+2)";
+  make "Left and Right" "Left (Right 1)" "Left (Right 1)";
+  make "match Left simple" "1" "match Left 2 with Left x -> 1 | Right x -> 2";
+  make "very simple match" "2" "match Left 2 with Left x -> x | Right x -> x + x";
+  make "very simple match" "4" "match Right 2 with Left x -> x | Right x -> x + x";
+  make "match Left" "3" "match Left 2 with Left x -> x + 1 | Right x -> x + 2";
 ]
 
 let _ = run_test_tt_main ("suite" >::: tests)
