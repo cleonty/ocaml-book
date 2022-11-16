@@ -17,9 +17,9 @@ let rec subst e v x = match e with
   | Bool _ -> e
   | Int _ -> e
   | Binop (bop, e1, e2) -> Binop (bop, subst e1 v x, subst e2 v x)
-  | Let (y, e1, e2) -> 
+  | Let (y, t, e1, e2) -> 
     let e' = subst e1 v x in
-    if y = x then Let (y, e', e2) else Let (y, e', subst e2 v x)
+    if y = x then Let (y, t, e', e2) else Let (y, t, e', subst e2 v x)
   | If (e1, e2, e3) -> If (subst e1 v x, subst e2 v x, subst e3 v x)
 
 (** [step] is the [-->] relation, that is, a single step of evaluation. *)
@@ -30,8 +30,8 @@ let rec step : expr -> expr = function
   | Binop (bop, e1, e2) when is_value e1 -> Binop (bop, e1, step e2)
   | Binop (bop, e1, e2) when is_value e2 -> Binop (bop, step e1, e2)
   | Binop (_, _, _) -> failwith "Unhandled binop"
-  | Let (x, e1, e2) when is_value e1 -> subst e2 e1 x
-  | Let (x, e1, e2) -> Let (x, step e1, e2)
+  | Let (x, _, e1, e2) when is_value e1 -> subst e2 e1 x
+  | Let (x, t, e1, e2) -> Let (x, t, step e1, e2)
   | If (Bool true, e2, _) -> e2
   | If (Bool false, _, e3) -> e3
   | If (Int _, _, _) -> failwith "Guard of if must have type bool"
@@ -56,7 +56,7 @@ let rec eval_big (e : expr) : expr = match e with
   | Int _ | Bool _ -> e
   | Var _ -> failwith "Unbound variable"
   | Binop (bop, e1, e2) -> eval_bop bop e1 e2
-  | Let (x, e1, e2) -> eval_let x e1 e2
+  | Let (x, _, e1, e2) -> eval_let x e1 e2
   | If (e1, e2, e3) -> eval_if e1 e2 e3
 
 and eval_let x e1 e2 = 
