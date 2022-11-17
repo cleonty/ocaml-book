@@ -51,8 +51,8 @@ let rec eval_small (e : expr) : expr =
   if is_value e then e
   else e |> step |> eval_small
   
-(** [eval_big e] is the [e ==> v] relation. *)
-let rec eval_big (e : expr) : expr = match e with
+(** [eval e] is the [e ==> v] relation. *)
+let rec eval (e : expr) : expr = match e with
   | Int _ | Bool _ -> e
   | Var _ -> failwith "Unbound variable"
   | Binop (bop, e1, e2) -> eval_bop bop e1 e2
@@ -60,21 +60,21 @@ let rec eval_big (e : expr) : expr = match e with
   | If (e1, e2, e3) -> eval_if e1 e2 e3
 
 and eval_let x e1 e2 = 
-  let v1 = eval_big e1 in
+  let v1 = eval e1 in
   let e2' = subst e2 v1 x in
-  eval_big e2'
+  eval e2'
 
 (** [eval_bop bop e1 e2] is the [e] such that [e1 bop e2 ==> e]. *)
-and eval_bop bop e1 e2 = match bop, eval_big e1, eval_big e2 with
+and eval_bop bop e1 e2 = match bop, eval e1, eval e2 with
   | Add, Int a, Int b -> Int (a + b)
   | Mult, Int a, Int b -> Int (a * b)
   | Leq, Int a, Int b -> Bool (a <= b)
   | _ -> failwith "Operator and operand type mismatch"
   
 (** [eval_if e1 e2 e3] is the [e] such that [if e1 then e2 else e3 ==> e]. *)
-and eval_if e1 e2 e3 = match eval_big e1 with
-  | Bool true -> eval_big e2
-  | Bool false -> eval_big e3
+and eval_if e1 e2 e3 = match eval e1 with
+  | Bool true -> eval e2
+  | Bool false -> eval e3
   | Int _ -> failwith "Guard of if must have type bool"
   | _ -> failwith "precondition violated"
 
@@ -89,4 +89,4 @@ let string_of_val (e: expr) : string =
 (** [interp s] interprets [s] by lexing and parsing it,
     evaluating it, and covberting the result to a string. *)
 let interp (s: string) : string =
-  s |> parse |> eval_big |> string_of_val 
+  s |> parse |> eval |> string_of_val 
