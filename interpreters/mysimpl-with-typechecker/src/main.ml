@@ -77,4 +77,16 @@ and eval_if e1 e2 e3 = match eval_big e1 with
   | Bool false -> eval_big e3
   | Int _ -> failwith "Guard of if must have type bool"
   | _ -> failwith "precondition violated"
-  
+
+(** [string_of_val v] converts [v] to a string.
+    Requires: [v] represents a value. *)
+let string_of_val (e: expr) : string =
+  match e with
+  | Int i -> string_of_int i
+  | Bool b -> string_of_bool b
+  | _ -> failwith "precondition violated"  
+
+(** [interp s] interprets [s] by lexing and parsing it,
+    evaluating it, and covberting the result to a string. *)
+let interp (s: string) : string =
+  s |> parse |> eval_big |> string_of_val 
