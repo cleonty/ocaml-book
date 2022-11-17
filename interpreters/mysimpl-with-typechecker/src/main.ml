@@ -10,6 +10,21 @@ let is_value : expr -> bool = function
   | Int _ | Bool _ -> true
   | Var _ | Let _ | Binop _ | If _ -> false
 
+let empty = []
+
+(** [typeof env e] is the typeof [e] in environment [env].
+    That is, it is the [t] such that [env |- e : t].
+    Raises: [Failure] if no such type [t] exists. *)
+let typeof env e = 
+  failwith "TODO"
+
+  (** [typecheck e] is [e] if [e] typechecks, that is, if there extsts a type
+      [t] such that [{} |- e : t].
+      Raises: [Failure] if [e] does not type check. *)
+let typecheck e = 
+  ignore (typeof empty e); e
+(* it's equivalent to [let _ = typeof empty e in e] *)
+  
 (** [subst e v x] is [e] with [v] substituted for [x], that
     is [e{v/x}]. *)
 let rec subst e v x = match e with
@@ -89,4 +104,4 @@ let string_of_val (e: expr) : string =
 (** [interp s] interprets [s] by lexing and parsing it,
     evaluating it, and covberting the result to a string. *)
 let interp (s: string) : string =
-  s |> parse |> eval |> string_of_val 
+  s |> parse |> typecheck |> eval |> string_of_val 
