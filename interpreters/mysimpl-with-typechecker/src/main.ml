@@ -24,6 +24,10 @@ let unbound_var_err = "Unbound variable"
 
 let bop_err = "Operator and operand mismatch"
 
+(** The error message produced if the binding expression of a [let]
+    does not have the same type as the annotation on the variable name. *)
+let annotation_error = "Let expression type mismatch"
+
 (** [empty] is the empty environemnt. *)
 let empty = []
 
@@ -33,7 +37,12 @@ let lookup env x =
   match List.assoc_opt x env with
   | Some t -> t
   | None -> type_error unbound_var_err
-  
+
+(** [extend env x t] is [env] extended with a binding of
+    [x] to [t]. *)
+let extend env x t =
+  (x, t) :: env
+
 (** [typeof env e] is the typeof [e] in environment [env].
     That is, it is the [t] such that [env |- e : t].
     Raises: [Failure] if no such type [t] exists. *)
@@ -42,14 +51,27 @@ let rec typeof env = function
   | Int _ -> TInt
   | Var x -> lookup env x
   | Binop (bop, e1, e2) -> typeof_binop env bop e1 e2
+  | Let (x, t, e1, e2) -> typeof_let env x t e1 e2
   | _ -> failwith "TODO"
 
+(** [typeof_binop env bop e1 e2] is the type of [e1 bop e2] in
+    environment [env]. *)
 and typeof_binop env bop e1 e2 =
   match bop, typeof env e1, typeof env e2 with
   | Add, TInt, TInt -> TInt
   | Mult, TInt, TInt -> TInt
   | Leq, TInt, TInt -> TBool
   | _ -> type_error bop_err
+
+(** [typeof_let env x t e1 e2] is the type of [let x: t = e1 in e2 ]
+    in environment [env]. *)
+and typeof_let env x t e1 e2 =
+    let t' = typeof env e1 in
+    if t = t' then
+      let env' = extend env x t' in
+      typeof env' e2
+    else
+      type_error annotation_error
 
   (** [typecheck e] is [e] if [e] typechecks, that is, if there extsts a type
       [t] such that [{} |- e : t].
