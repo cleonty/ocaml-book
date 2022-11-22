@@ -177,7 +177,19 @@ let string_of_val (e: expr) : string =
   | Bool b -> string_of_bool b
   | _ -> runtime_error "precondition violated"  
 
+(** [interp_small s] interprets [s] by parsing, type-checking,
+    and evaluating it with the small-step model. *)
+let interp_small (s : string) : expr =
+  let e = parse s in
+  ignore (typecheck e) ; eval_small e
+    
 (** [interp s] interprets [s] by lexing and parsing it,
     evaluating it, and covberting the result to a string. *)
 let interp (s: string) : string =
-  s |> parse |> typecheck |> eval |> string_of_val 
+  s |> parse |> typecheck |> eval |> string_of_val
+  
+(** [interp_big s] interprets [s] by parsing, type-checking,
+  and evaluating it with the big-step model. *)
+  let interp_big (s : string) : expr =
+    let e = parse s in
+    ignore (typecheck e); eval e
