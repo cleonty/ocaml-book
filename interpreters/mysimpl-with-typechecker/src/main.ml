@@ -24,6 +24,13 @@ let unbound_var_err = "Unbound variable"
 
 let bop_err = "Operator and operand mismatch"
 
+(** The error message if a if condition is not boolean. *)
+let if_guard_err = "Guard of if must have type bool"
+  
+(** The error message produced if the two branches of an [if]
+    do not have the same type. *)
+let if_branch_err = "Branches of if must have same type"
+
 (** The error message produced if the binding expression of a [let]
     does not have the same type as the annotation on the variable name. *)
 let annotation_error = "Let expression type mismatch"
@@ -52,7 +59,7 @@ let rec typeof env = function
   | Var x -> lookup env x
   | Binop (bop, e1, e2) -> typeof_binop env bop e1 e2
   | Let (x, t, e1, e2) -> typeof_let env x t e1 e2
-  | _ -> failwith "TODO"
+  | If (e1, e2, e3) -> typeof_if env e1 e2 e3
 
 (** [typeof_binop env bop e1 e2] is the type of [e1 bop e2] in
     environment [env]. *)
@@ -73,6 +80,20 @@ and typeof_let env x t e1 e2 =
     else
       type_error annotation_error
 
+(** [typeof_if env e1 e2 e3] is the type of [if e1 then e2 else e3]
+    in environemnt [env]. *)
+and typeof_if env e1 e2 e3 =
+  let t1 = typeof env e1 in
+  if t1 <> TBool then
+    type_error if_guard_err
+  else
+    let t2 = typeof env e2 in
+    let t3 = typeof env e3 in
+    if t2 <> t3 then
+      type_error if_branch_err
+    else
+      t2 
+  
   (** [typecheck e] is [e] if [e] typechecks, that is, if there extsts a type
       [t] such that [{} |- e : t].
       Raises: [Failure] if [e] does not type check. *)
