@@ -29,7 +29,7 @@ let rec step : expr -> expr = function
   | Binop (bop, e1, e2) when is_value e1 && is_value e2 -> step_bop bop e1 e2
   | Binop (bop, e1, e2) when is_value e1 -> Binop (bop, e1, step e2)
   | Binop (bop, e1, e2) when is_value e2 -> Binop (bop, step e1, e2)
-  | Binop (_, _, _) -> failwith "Unhandled binop"
+  | Binop (bop, e1, e2) -> Binop (bop, step e1, e2)
   | Let (x, e1, e2) when is_value e1 -> subst e2 e1 x
   | Let (x, e1, e2) -> Let (x, step e1, e2)
   | If (Bool true, e2, _) -> e2
