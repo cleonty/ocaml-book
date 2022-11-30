@@ -47,3 +47,22 @@ env |- if e1 then e2 else e3 : 't -| C1, C2, C3, C
   {} |- 1 : int -| {}
   C = {bool = bool, 'a = int, 'a = int}
 ```
+
+# Anonymous functions
+
+```
+Rule:
+env |- fun x -> e : 't1 -> t2 -| C
+  if fresh 't1
+  and env, x : 't1 |- e : t2 -| C
+```
+
+## Example
+
+```
+{} |- fun x -> if x then 1 else 0 : 'a -> 'b -| {'a = bool, 'b = int}
+  {x: 'a} |- if x then 1 else 0 : 'b -| C where C is {'a = bool, 'b = int}
+    {x : 'a} |- x : 'a -| {}
+    {x : 'a} |- 1 : int -| {}
+    {x : 'a} |- 0 : int -| {}
+    C = {'a = bool, 'b = int, 'b = int}
