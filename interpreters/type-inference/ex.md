@@ -66,3 +66,27 @@ env |- fun x -> e : 't1 -> t2 -| C
     {x : 'a} |- 1 : int -| {}
     {x : 'a} |- 0 : int -| {}
     C = {'a = bool, 'b = int, 'b = int}
+```
+
+# Function application
+
+```
+Rule:
+env |- e1 e2 : 't -| C1, C2, C
+  if fresh 't
+  and env |- e1 : t1 -| C1
+  and env |- e2 : t2 -| C2
+  and C = {t1 = t2 -> 't}
+```
+
+## Example
+
+`I` is an env that binds `+`, `*`, etc.
+
+```
+I |- (+) 1 : 'a -| C = {int -> int -> int = int -> 'a} = {int -> int = 'a}
+  I |- ( + ) : int -> int -> int -| {}
+  I |- 1 : int -| {}
+  C = {int -> int -> int = int -> 'a}
+  
+```
