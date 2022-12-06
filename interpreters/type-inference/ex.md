@@ -160,3 +160,61 @@ int -> int = 'y
 
 {int / 'x}; {int -> int / y}
 ```
+
+# Type Inference Example
+
+```
+I |- fun f -> fun x -> f (( + ) x 1) : 'a -> 'b -> 'e -| 'a = 'd -> 'e, 'c = int -> 'd, int -> int -> int = 'b -> 'c
+  I, f : 'a |- fun x -> f (( + ) x 1) : 'b -> 'e -| 'a = 'd -> 'e, 'c = int -> 'd, int -> int -> int = 'b -> 'c
+    I, f : 'a, x : 'b |- f (( + ) x 1) : 'e -| 'a = 'd -> 'e, 'c = int -> 'd, int -> int -> int = 'b -> 'c
+      I, f : 'a, x : 'b |- f : 'a -| {}
+      I, f : 'a, x : 'b |- (( + ) x) 1 : 'd -| 'c = int -> 'd, int -> int -> int = 'b -> 'c
+        I, f : 'a, x : 'b |- ( + ) x : 'c -| int -> int -> int = 'b -> 'c
+          I, f : 'a, x : 'b |- ( + ) : int -> int -> int -| {}
+          I, f : 'a, x : 'b |- x : 'b -| {}
+        I, f : 'a, x : 'b |- 1 : int -| {}
+
+---
+'a = 'd -> 'e
+'c = int -> 'd
+int -> int -> int = 'b -> 'c
+
+{ 'd -> 'e / 'a}
+---
+'c = int -> 'd
+int -> int -> int = 'b -> 'c
+
+{ 'd -> 'e / 'a}
+---
+int -> int -> int = 'b -> 'c
+
+{ 'd -> 'e / 'a}, { int -> 'd / 'c}
+---
+int -> int -> int = 'b -> int -> 'd
+
+{ 'd -> 'e / 'a}, { int -> 'd / 'c}
+---
+int = 'b
+int -> int = int -> 'd
+
+{ 'd -> 'e / 'a}, { int -> 'd / 'c}
+---
+int -> int = int -> 'd
+
+{ 'd -> 'e / 'a}, { int -> 'd / 'c}, { int / 'b}
+---
+int = int
+int = 'd
+
+{ 'd -> 'e / 'a}, { int -> 'd / 'c}, { int / 'b}
+---
+int = 'd
+
+{ 'd -> 'e / 'a}, { int -> 'd / 'c}, { int / 'b}, { int / 'd}
+----
+----
+'a -> 'b -> 'e
+('d -> 'e) -> 'b -> 'e
+('d -> 'e) -> int -> 'e
+(int -> 'e) -> int -> 'e
+```
