@@ -218,3 +218,47 @@ int = 'd
 ('d -> 'e) -> int -> 'e
 (int -> 'e) -> int -> 'e
 ```
+
+# Naive inference for let
+
+```
+Rule:
+env |- let x = e1 in e2 : t2 -| C1, C2
+  if env |- e1 : t1 -| C1
+  and env, x : t1 |- e2 : t2 -| C2
+```
+
+## Example
+
+```
+{} |- let x = 42 in  : int -| {}
+  {} |- 42 : int -| {}
+  {x : int} |- x : int -| {}
+```
+
+## Polymorphism is tricky
+
+```
+let id = fun x -> x in
+let a = id 0 in
+id true
+``` 
+
+Naive rule doesn't work
+
+- Puts `id : 'a -> 'a` in environment
+- Later when `id` is applied
+- `id 0` generates `'a -> 'a = int -> 'b`
+- `id true` generates `'a -> 'a = bool -> 'c`
+- so `'a = int = bool` needs to hold but cannot!
+
+# Type schemes
+
+- Inspired by universal quantification in logic
+  - for all `x`, it holds that `0*x=0`
+- A type scheme is written `'a.t`
+  - `'a` is a type variable that is in scope in t
+  - `t` is a type
+- Extended syntax: `'a1 ... 'an.t`
+  - Like in logic: for all `x`, `y`, `z`, it holds that `x(y + z) = xy + xz`
+
