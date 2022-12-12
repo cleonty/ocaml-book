@@ -262,3 +262,42 @@ Naive rule doesn't work
 - Extended syntax: `'a1 ... 'an.t`
   - Like in logic: for all `x`, `y`, `z`, it holds that `x(y + z) = xy + xz`
 
+# Generalization and instantiation 
+
+```
+let id = fun x -> x in ...
+```
+
+- **Generalize** type to 'a . 'a -> 'a in environment
+- At each application, **instantiate** type with new type variables
+  - at `id 0`, instantiate to `'b -> 'b`
+  - at `id true`, instantiate to `'c -> 'c`
+  - Now each use is independent of the others
+
+```
+env |- let x = e1 in e2 : t2 -| C1, C2
+  if env |- e1 : t1 -| C1
+  and generalize (C1, env, x : t1)
+    |- e2 : t2 -| C2
+
+env |- : instantiate(env(n)) -| {}
+```
+
+## Instantiation
+
+- Doesn't change a type
+- Changes a type scheme to a type
+  - Get rid of the `'a1 ... 'an` before the dot
+  - Substitute a fresh type variable for each of them
+- E.g. `'a -> 'a -> 'a` becomes `'b -> 'b` for a fresh `'b`
+
+## Generalization
+
+`generalize(C1, env, x : t1)`
+- Fully finish inference of binding expression:
+  - use `unify` to solve C1
+  - Apply resulting substitution to `env` and `t1`, yielding `env1` and `u1` 
+- Generalize `u1` to to a type scheme `s1`
+- Do generalize variables in `u1`
+- Do not generalize variables also in `env`: they are constrained by outside code
+- Return `env1`, `x : s1`
