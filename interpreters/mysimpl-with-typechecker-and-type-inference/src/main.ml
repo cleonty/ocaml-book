@@ -194,3 +194,7 @@ let interp (s: string) : string =
     let e = parse s in
     ignore (typecheck e); eval e
 
+(** [infer s] is the type of [s] in the empty context. *)
+let infer (s: string) : typ =
+  let e = parse s in
+  typeof empty e
