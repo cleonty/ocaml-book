@@ -121,6 +121,30 @@
     7
 
   let f = (fun x -> fun y -> x + y) in let g = f 3 in (g 1) + (f 2 3) (9 steps)
+--> (let)
+    (let g = f 3 in (g 1) + (f 2 3)){(fun x -> fun y -> x + y) / f}
+=   (let g = (fun x -> fun y -> x + y) 3 in (g 1) + ((fun x -> fun y -> x + y) 2 3))
+--> (app)
+=   (let g = (fun y -> x + y){3 / x} in (g 1) + ((fun x -> fun y -> x + y) 2 3))
+    (let g = fun y -> 3 + y in (g 1) + ((fun x -> fun y -> x + y) 2 3))
+--> (let)
+    ((g 1) + ((fun x -> fun y -> x + y) 2 3))){fun y -> 3 + y / g}
+=   (((fun y -> 3 + y) 1) + ((fun x -> fun y -> x + y) 2 3)))
+--> (app)
+    (3 + y){1 / y} + (fun x -> fun y -> x + y) 2 3
+=   (3 + 1) + (fun x -> fun y -> x + y) 2 3
+=   (+)
+    4 + (fun x -> fun y -> x + y) 2 3
+--> (app)
+    4 + ((fun y -> x + y) {2 / x}) 3
+=   4 + (fun y -> 2 + y) 3
+--> (app)
+    4 + (2 + y) {3 / y}
+=   4 + (2 + 3)
+--> (+)
+    4 + 5
+--> (+)
+    9
 ```
 
 
