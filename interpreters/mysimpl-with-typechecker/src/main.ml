@@ -15,9 +15,11 @@ let parse (s: string) : expr =
   ast
 
 (** [is_value e] is whether [e] is a value *)
-let is_value : expr -> bool = function
+let rec is_value : expr -> bool = function
   | Int _ | Bool _ -> true
   | Var _ | Let _ | Binop _ | If _ -> false
+  | Pair (e1, e2) when is_value e1 && is_value e2 -> true
+  | Pair _ -> false
 
 (** The error message produced if a variable is unbound. *)
 let unbound_var_err = "Unbound variable"
@@ -60,6 +62,7 @@ let rec typeof env = function
   | Binop (bop, e1, e2) -> typeof_binop env bop e1 e2
   | Let (x, t, e1, e2) -> typeof_let env x t e1 e2
   | If (e1, e2, e3) -> typeof_if env e1 e2 e3
+  | Pair (e1, e2) -> typeof_pair env e1 e2
 
 (** [typeof_binop env bop e1 e2] is the type of [e1 bop e2] in
     environment [env]. *)
@@ -93,6 +96,13 @@ and typeof_if env e1 e2 e3 =
       type_error if_branch_err
     else
       t2 
+
+(** [typeof_pair env e1 e2] is the type of the pair (e1, e2)
+    in environemnt [env]. *)
+and typeof_pair env e1 e2 =
+  let t1 = typeof env e1 in
+  let t2 = typeof env e2 in
+  TPair(t1, t2)
   
   (** [typecheck e] is [e] if [e] typechecks, that is, if there extsts a type
       [t] such that [{} |- e : t].
@@ -112,6 +122,7 @@ let rec subst e v x = match e with
     let e' = subst e1 v x in
     if y = x then Let (y, t, e', e2) else Let (y, t, e', subst e2 v x)
   | If (e1, e2, e3) -> If (subst e1 v x, subst e2 v x, subst e3 v x)
+  | Pair (e1, e2) -> Pair (subst e1 v x, subst e2 v x)
 
 (** [step] is the [-->] relation, that is, a single step of evaluation. *)
 let rec step : expr -> expr = function
@@ -127,6 +138,9 @@ let rec step : expr -> expr = function
   | If (Bool false, _, e3) -> e3
   | If (Int _, _, _) -> runtime_error "Guard of if must have type bool"
   | If (e1, e2, e3) -> If(step e1, e2, e3)
+  | Pair (e1, e2) when is_value(e1) && is_value(e2) -> Pair (e1, e2)
+  | Pair (e1, e2) when is_value(e1) -> Pair (e1, step e2)
+  | Pair (e1, e2) -> Pair (step e1, e2)
 
 (** [step_bop bop v1 v2] implements the primitive operation
     [v1 bop v2]. Requires: [v1] and [v2] are both values. *)
@@ -149,6 +163,7 @@ let rec eval (e : expr) : expr = match e with
   | Binop (bop, e1, e2) -> eval_bop bop e1 e2
   | Let (x, _, e1, e2) -> eval_let x e1 e2
   | If (e1, e2, e3) -> eval_if e1 e2 e3
+  | Pair (e1, e2) -> Pair (eval e1, eval e2)
 
 and eval_let x e1 e2 = 
   let v1 = eval e1 in
@@ -171,10 +186,11 @@ and eval_if e1 e2 e3 = match eval e1 with
 
 (** [string_of_val v] converts [v] to a string.
     Requires: [v] represents a value. *)
-let string_of_val (e: expr) : string =
+let rec string_of_val (e: expr) : string =
   match e with
   | Int i -> string_of_int i
   | Bool b -> string_of_bool b
+  | Pair (e1, e2) -> "(" ^ (string_of_val e1) ^ ", " ^ (string_of_val e2) ^ ")"
   | _ -> runtime_error "precondition violated"  
 
 (** [interp_small s] interprets [s] by parsing, type-checking,

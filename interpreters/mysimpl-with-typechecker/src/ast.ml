@@ -7,6 +7,7 @@ type bop =
 type typ =
   | TInt
   | TBool
+  | TPair of typ * typ
 
 type expr =
   | Var of string
@@ -15,3 +16,4 @@ type expr =
   | Binop of bop * expr *expr
   | Let of string * typ * expr * expr
   | If of expr * expr * expr
+  | Pair of expr * expr
