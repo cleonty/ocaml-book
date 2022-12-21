@@ -147,4 +147,66 @@
     9
 ```
 
+## Exercise: desugar list [★]
 
+  - `[]` is syntactic sugar for `Left 0`.
+  - `e1 :: e2` is syntactic sugar for `Right (e1, e2)`. 
+
+What is the core OCaml expression to which `[1; 2; 3]` desugars?
+
+Answer: `Right(1, Right(2, Right(3, (Left 0)))`
+
+
+```
+let notempty = (fun l -> match l with Left x -> false | Right x -> true) in notempty (Left 0) 
+```
+
+## Exercise: generalize patterns [★★★★]
+
+```
+p ::= i | (p1, p2) | Left p | Right p | x | _
+
+e ::= ...
+    | match e with | p1 -> e1 | p2 -> e2 | ... | pn -> en
+```
+
+```
+(* This rule should implement evaluation of e. *)
+match e with | p1 -> e1 | p2 -> e2 | ... | pn -> en
+--> match e' with | p1 -> e1 | p2 -> e2 | ... | pn -> en
+  if e --> e'
+
+(* This rule implements moving past p1 to the next pattern. *)
+match v with | p1 -> e1 | p2 -> e2 | ... | pn -> en
+--> match v with | p2 -> e2 | ... | pn -> en
+  if there does not exist an s such that v =~ p1 // s
+
+(* This rule implements matching v with p1 then proceeding to evaluate e1. *)
+match v with | p1 -> e1 | p2 -> e2 | ... | pn -> en
+--> e1 s (* something involving e1 *)
+  if v =~ p1 // s
+```
+
+```
+    match (1 + 2, 3) with
+    | (1, 0) -> 4
+    | (1, x) -> x
+    | (x, y) -> x + y
+--> (step +)
+    match (3, 3) with
+    | (1, 0) -> 4
+    | (1, x) -> x
+    | (x, y) -> x + y
+--> (doesn't match)
+    match (3, 3) with
+    | (1, x) -> x
+    | (x, y) -> x + y    
+--> (doesn't match)
+    match (3, 3) with
+    | (x, y) -> x + y  
+--> (match)
+    (x + y){3 / x} {3 / y}
+  = 3 + 3
+--> (step +)
+    6
+```
