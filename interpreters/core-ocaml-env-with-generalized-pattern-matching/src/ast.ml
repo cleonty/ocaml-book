@@ -31,5 +31,5 @@ type expr =
   | Snd of expr
   | Left of expr
   | Right of expr
-  | Match of expr * string * expr * string * expr (** (e, x1, e1, x2, e2) *)
+  | Match of expr * string * expr * string * expr * expr option (** (e, x1, e1, x2, e2, e3) *)
 

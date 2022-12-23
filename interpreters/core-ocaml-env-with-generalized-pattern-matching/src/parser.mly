@@ -15,7 +15,7 @@ let rec make_apply e = function
 
 %token <string> ID
 %token <int> INT
-%token FUN ARROW LPAREN RPAREN EOF TRUE FALSE PLUS MINUS TIMES DIV LEQ LE GEQ GE EQUALS LET IN IF THEN ELSE FIRST SECOND COMMA LEFT RIGHT MATCH WITH ALT
+%token FUN ARROW LPAREN RPAREN EOF TRUE FALSE PLUS MINUS TIMES DIV LEQ LE GEQ GE EQUALS LET IN IF THEN ELSE FIRST SECOND COMMA LEFT RIGHT MATCH WITH ALT UNDERSCORE
 
 %nonassoc IN
 %nonassoc ELSE
@@ -63,7 +63,8 @@ simpl_expr:
 	| SECOND; e = simpl_expr { Snd (e) }
 	| LEFT; e = simpl_expr { Left (e) }
 	| RIGHT; e = simpl_expr { Right (e) }
-	| MATCH; e = simpl_expr; WITH; LEFT; x1 = ID; ARROW; e1 = simpl_expr; ALT; RIGHT; x2 = ID; ARROW; e2 = simpl_expr; { Match(e, x1, e1, x2, e2) }
+	| MATCH; e = simpl_expr; WITH; LEFT; x1 = ID; ARROW; e1 = simpl_expr; ALT; RIGHT; x2 = ID; ARROW; e2 = simpl_expr;  { Match(e, x1, e1, x2, e2, None) }
+	| MATCH; e = simpl_expr; WITH; LEFT; x1 = ID; ARROW; e1 = simpl_expr; ALT; RIGHT; x2 = ID; ARROW; e2 = simpl_expr; ALT; UNDERSCORE; e3 = simpl_expr { Match(e, x1, e1, x2, e2, Some e3) }
   | LPAREN; e=expr; RPAREN { e } 
   | LPAREN; MINUS; e=expr; RPAREN { Unop (Uminus, e) } 
   | LPAREN; PLUS; e=expr; RPAREN { Unop (Uplus, e) }
