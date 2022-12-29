@@ -210,3 +210,29 @@ match v with | p1 -> e1 | p2 -> e2 | ... | pn -> en
 --> (step +)
     6
 ```
+
+Exercise: simple expressions [★]
+
+```
+<{}, 110 + 3*1000> ==> 3110
+  because <{}, 110> ==> 110
+  and     <{}, 3*1000> ==> 3000
+    because<{}, 3> ==> 3
+    and    <{}, 1000> ==> 3
+    and    3*1000 is 3000
+  and 110 + 3000 is 3110
+```
+
+```
+<{}, if 2 + 3 < 4 then 1 + 1 else 2 + 2>
+  because <{}, 2 + 3 < 4> ==> false
+    because <{}, 2 + 3> ==> 5
+      because <{}, 2> ==> 2
+      and     <{}, 3> ==> 3
+      and     2 + 3 is 5
+    and     <{}, 4> ==> 4
+    and     5 < 4 is false
+  and     <{}, 2 + 2> ==> 4
+      because <{}, 2> ==> 2
+      and     <{}, 2> ==> 2
+      and     2 + 2 is 2
