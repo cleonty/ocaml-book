@@ -236,3 +236,29 @@ Exercise: simple expressions [★]
       because <{}, 2> ==> 2
       and     <{}, 2> ==> 2
       and     2 + 2 is 2
+```
+
+## Exercise: lexical scope and shadowing [★★]
+
+```
+<[], let x=0 in x + (let x=1 in x)> ==> 1
+  because <[], 0> ==> 0
+  and     <[x->0], x + (let x = 1 in x)>
+    because <[x->0], x> ==> 0
+    and     <[x->0], let x = 1 in x>
+      because     <[x->0], 1> ==> 1
+      and         <[x->1], x> ==> 1
+    and 0 + 1 is 1
+```
+
+```
+<[], let x=1 in let f=fun y -> x in let x=2 in f 0>  ==> 1        (let)
+  because <[], 1> ==> 1                                           (const)
+  and     <[x->1], let f = fun y -> x in let x=2 in f 0> ==> 1    (let)
+    because <[x->1], fun y -> x> ==>  (|fun y -> x , [x->1]|)     (closure)
+    and     <[f->(|fun y -> x , [x->1]|), x->1], let x=2 in f 0> ==> 1  (let)
+      because <[f->(|fun y -> x , [x->1]|), x->1], 2> ==> 2       (const)
+      and     <[f->(|fun y -> x , [x->1]|), x->2], f 0> ==>       
+        because <[f->(|fun y -> x , [x->1]|), x->2], f> ==> (|fun y -> x , [x->1]|)
+        and     <[f->(|fun y -> x , [x->1]|), x->2], 0> ==> 0
+        and     <[y->0,x->1], x> ==> 1
