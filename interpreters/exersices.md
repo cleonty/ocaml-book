@@ -262,3 +262,39 @@ Exercise: simple expressions [★]
         because <[f->(|fun y -> x , [x->1]|), x->2], f> ==> (|fun y -> x , [x->1]|)
         and     <[f->(|fun y -> x , [x->1]|), x->2], 0> ==> 0
         and     <[y->0,x->1], x> ==> 1
+```
+
+## Exercise: dynamic scope [★★★]
+
+```
+let x = 5 in
+let f y = x + y in
+let x = 4 in
+f 3
+```
+
+Dynamic scope `<[x->4, y->3], x + y> ==> 7`
+Lexical scope `<[y->3, 5 + y> ==> 8`
+
+## Exercise: more dynamic scope [★★★]
+
+```
+let x = 5 in
+let f y = x + y in
+let g x = f x in
+let x = 4 in
+g 3
+```
+Dynamic scope `<[x->4, y->3], x + y> ==> 7`
+Lexical scope `<[x->5, y->3], x + y> ==> 8`
+
+```
+let f y = x + y in
+let x = 3 in
+let y = 4 in
+f 2
+```
+
+Dynamic scope `<[x->3, y->2], x + y> ==> 5`
+Lexical scope `Unbound variable `x``
+
