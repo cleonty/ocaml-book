@@ -298,3 +298,53 @@ f 2
 Dynamic scope `<[x->3, y->2], x + y> ==> 5`
 Lexical scope `Unbound variable `x``
 
+## Exercise: constraints [★★]
+
+1. fun x -> ( + ) 1 x
+```
+{} |- fun x -> ( + ) 1 x : 'a -> 'b -| {}
+  {x: 'a} |- (+) 1 x : 'c -| {int -> int = 'a, }
+    {x: 'a} |- (+) 1 : 'c -| C = {int -> int -> int = int -> 'a} = {int -> int = 'a}
+      I |- ( + ) : int -> int -> int -| {}
+      I |- 1 : int -| {}
+      C = {int -> int -> int = int -> 'a}
+    {x: 'a} |- x : 'a -| {}
+    {x: 'a} |- 
+```
+fun b -> if b then false else true
+fun x -> fun y -> if x <= y then y else x
+
+
+## Exercise: unify [★★]
+
+```
+X = int
+Y = X -> X
+```
+
+
+```
+ Our result, which we'll call U, is:
+  unify ({ X = int, Y = X -> X }) = {| int/X, (int -> int)/Y |}
+   because it's equal to U';{| int/X |},
+    where U' is:
+     unify ({| int/X |}{ Y = X -> X })
+     = unify ({ Y = int -> int })
+     = {| (int -> int)/Y |}
+      because U' equals U'';{| (int -> int)/Y |},
+       where U'' is
+        unify ({| (int -> int)/Y |}{})
+        = {| |} (the empty substitution).
+```
+
+```
+X -> Y = Y -> Z
+Z = U -> W
+
+{|U -> W / Z|} X -> Y = Y -> (U -> W)
+X = Y
+Y = U -> W
+{|Y/X|, |U -> W / Y| }
+
+{|U -> W / X|, |U -> W / Y|}
+```
