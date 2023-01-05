@@ -348,3 +348,53 @@ Y = U -> W
 
 {|U -> W / X|, |U -> W / Y|}
 ```
+
+## Exercise: infer apply [★★★]
+
+```
+let apply f x = f x
+let apply = fun f -> fun x -> f x
+
+I |- fun f -> fun x -> f x : 'a -> 'b -> 'c -| {'a = 'b -> 'c}
+  I, f : 'a |- fun x -> f x : 'b -> 'c -| {'a = 'b -> 'c}
+    I, f : 'a, x : 'b |- f x : 'c -| {'a = 'b -> 'c}
+      I, f : 'a, x : 'b |- f : 'a -| {}
+      I, f : 'a, x : 'b |- x : 'b -| {}
+		   
+{('b -> 'c) / 'a} 'a -> 'b -> 'c
+=substitute
+=('b -> 'c) -> 'b -> 'c
+rename
+=('a -> 'b) -> 'a -> 'b
+Inferred Type: ('a -> 'b) -> 'a -> 'b
+```
+
+## Exercise: infer double [★★★]
+
+```
+let double f x = f (f x)
+let double -> fun f -> fun x -> f (f x)
+
+I |- fun f -> fun x -> f (f x) : 'a -> 'b -> 'd -| {'a = 'c -> 'd, 'a = 'b -> 'c}
+  I, f : 'a |- fun x -> f (f x) : 'b -> 'd -| {'a = 'c -> 'd, 'a = 'b -> 'c}
+  I, f : 'a, x : 'b |- f (f x) : 'd -| {'a = 'c -> 'd, 'a = 'b -> 'c}
+    I, f : 'a, x : 'b |- f : 'a -| {}
+    I, f : 'a, x : 'b |- f x : 'c -| {'a = 'b -> 'c}
+      I, f : 'a, x : 'b |- f : 'a -| {}
+      I, f : 'a, x : 'b |- x : 'b -| {}
+
+'a = 'c -> 'd
+'a = 'b -> 'c
+
+'c -> 'd = 'b -> 'c
+
+'c = 'b
+'d = 'c
+
+'d = 'b
+
+'a -> 'b -> 'd = ('c -> 'd) -> 'b -> 'd = ('d -> 'd) -> 'd -> 'd
+
+Inferred Type: ('a -> 'a) -> 'a -> 'a
+
+```
