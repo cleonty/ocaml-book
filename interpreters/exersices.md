@@ -398,3 +398,41 @@ I |- fun f -> fun x -> f (f x) : 'a -> 'b -> 'd -| {'a = 'c -> 'd, 'a = 'b -> 'c
 Inferred Type: ('a -> 'a) -> 'a -> 'a
 
 ```
+
+
+## Exercise: infer S [★★★★]
+
+Using the HM type inference algorithm, infer the type of the following definition:
+
+```
+let s x y z = (x z) (y z)
+let s = fun x -> fun y -> fun z -> (x z) (y z)
+
+I |- fun x -> fun y -> fun z -> (x z) (y z) : 'a -> 'b -> 'c -> 'f -| {'d = 'e -> 'f, 'a = 'c -> 'd, 'b = 'c -> 'e}
+  I, x : 'a |- fun y -> fun z -> (x z) (y z) : 'b -> 'c -> 'f -| {'d = 'e -> 'f, 'a = 'c -> 'd, 'b = 'c -> 'e}
+    I, x : 'a, y : 'b |- fun z -> (x z) (y z) : 'c -> 'f -| {'d = 'e -> 'f, 'a = 'c -> 'd, 'b = 'c -> 'e}
+      I, x : 'a, y : 'b, z : 'c |- (x z) (y z) : 'f -| {'d = 'e -> 'f, 'a = 'c -> 'd, 'b = 'c -> 'e}
+        I, x : 'a, y : 'b, z : 'c |- (x z) : 'd -| { 'a = 'c -> 'd } 
+          I, x : 'a, y : 'b, z : 'c |- x : 'a -| {}
+          I, x : 'a, y : 'b, z : 'c |- z : 'c -| {}
+        I, x : 'a, y : 'b, z : 'c |- (y z) : 'e-| { 'b = 'c -> 'e } 
+          I, x : 'a, y : 'b, z : 'c |- y : 'b -| {}
+          I, x : 'a, y : 'b, z : 'c |- z : 'c -| {}
+
+unify
+'d = 'e -> 'f
+'a = 'c -> 'd
+'b = 'c -> 'e
+
+{'e -> 'f/'d}
+
+'a = 'c -> ('e -> 'f)
+'b = 'c -> 'e
+
+   'a -> 'b -> 'c -> 'f
+ = ('c -> ('e -> 'f)) -> ('c -> 'e) -> 'c -> 'f
+ = ('c -> 'e -> 'f) -> ('c -> 'e) -> 'c -> 'f
+ = ('c -> 'e -> 'f) -> ('c -> 'e) -> 'c -> 'f
+ = rename
+ = ('a -> 'b -> 'c) -> ('a -> 'b) -> 'a -> 'c
+```
